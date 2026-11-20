@@ -62,6 +62,7 @@ public class SupabaseStorageService {
         HttpRequest requisicao = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("apikey", secretKey)
+                .header("Authorization", "Bearer " + secretKey)
                 .header("Content-Type", tipoConteudo)
                 .header("x-upsert", "false")
                 .POST(HttpRequest.BodyPublishers.ofFile(arquivo))
@@ -102,6 +103,7 @@ public class SupabaseStorageService {
         HttpRequest requisicao = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("apikey", secretKey)
+                .header("Authorization", "Bearer " + secretKey)
                 .DELETE()
                 .build();
 
