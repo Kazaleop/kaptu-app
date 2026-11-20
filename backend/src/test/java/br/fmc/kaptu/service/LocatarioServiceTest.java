@@ -30,7 +30,7 @@ class LocatarioServiceTest {
     private Locatario criarLocatario() {
         return new Locatario(
                 "João Silva",
-                "12345678900",
+                "52998224725",
                 "92999999999",
                 "joao@gmail.com"
         );
@@ -38,7 +38,7 @@ class LocatarioServiceTest {
 
     @Test
     void deveCadastrarLocatarioValido() {
-        when(repository.existsByCpfCnpj("12345678900"))
+        when(repository.existsByCpfCnpj("52998224725"))
                 .thenReturn(false);
 
         when(repository.save(any(Locatario.class)))
@@ -46,7 +46,7 @@ class LocatarioServiceTest {
 
         Locatario resultado = service.cadastrar(
                 "João Silva",
-                "12345678900",
+                "52998224725",
                 "92999999999",
                 "joao@gmail.com"
         );
@@ -60,7 +60,7 @@ class LocatarioServiceTest {
         assertThrows(
                 RegraDeNegocioExcecao.class,
                 () -> service.cadastrar(
-                        "", "12345678900",
+                        "", "52998224725",
                         "92999999999", "joao@gmail.com"
                 )
         );
@@ -82,7 +82,7 @@ class LocatarioServiceTest {
         assertThrows(
                 RegraDeNegocioExcecao.class,
                 () -> service.cadastrar(
-                        "João", "12345678900", "",
+                        "João", "52998224725", "",
                         "joao@gmail.com"
                 )
         );
@@ -93,7 +93,7 @@ class LocatarioServiceTest {
         assertThrows(
                 RegraDeNegocioExcecao.class,
                 () -> service.cadastrar(
-                        "João", "12345678900",
+                        "João", "52998224725",
                         "92999999999", ""
                 )
         );
@@ -101,14 +101,14 @@ class LocatarioServiceTest {
 
     @Test
     void naoDeveCadastrarCpfDuplicado() {
-        when(repository.existsByCpfCnpj("12345678900"))
+        when(repository.existsByCpfCnpj("52998224725"))
                 .thenReturn(true);
 
         assertThrows(
                 RegraDeNegocioExcecao.class,
                 () -> service.cadastrar(
                         "João Silva",
-                        "12345678900",
+                        "52998224725",
                         "92999999999",
                         "joao@gmail.com"
                 )
@@ -150,3 +150,4 @@ class LocatarioServiceTest {
         );
     }
 }
+

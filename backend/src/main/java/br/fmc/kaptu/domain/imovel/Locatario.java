@@ -48,4 +48,27 @@ public class Locatario extends EntidadeBase {
     public String getEmail() {
         return email;
     }
+
+    public void atualizarDados(
+            String nome,
+            String cpfCnpj,
+            String telefone,
+            String email) {
+
+        if (nome != null && !nome.isBlank()) {
+            this.nome = nome.trim();
+        }
+
+        if (cpfCnpj != null && !cpfCnpj.isBlank()) {
+            this.cpfCnpj = cpfCnpj;
+        }
+
+        if (telefone != null && !telefone.isBlank()) {
+            this.telefone = telefone;
+        }
+
+        if (email != null && !email.isBlank()) {
+            this.email = email.trim().toLowerCase();
+        }
+    }
 }

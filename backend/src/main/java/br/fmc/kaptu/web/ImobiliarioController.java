@@ -75,12 +75,42 @@ public class ImobiliarioController {
                 .body(toDTO(locatario));
     }
 
+    @GetMapping("/locatarios/{id}")
+    public LocatarioDTO buscarLocatario(@PathVariable Long id) {
+        return toDTO(locatarioService.buscarPorId(id));
+    }
+
     @GetMapping("/locatarios")
     public List<LocatarioDTO> listarLocatarios() {
         return locatarioService.listar()
                 .stream()
                 .map(this::toDTO)
                 .toList();
+    }
+
+    @GetMapping(value = "/locatarios", params = "busca")
+    public List<LocatarioDTO> buscarLocatarios(
+            @RequestParam String busca) {
+        return locatarioService.buscar(busca)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    @PutMapping("/locatarios/{id}")
+    public LocatarioDTO atualizarLocatario(
+            @PathVariable Long id,
+            @Valid @RequestBody LocatarioRequest request) {
+
+        Locatario locatario = locatarioService.atualizar(
+                id,
+                request.nome(),
+                request.cpfCnpj(),
+                request.telefone(),
+                request.email()
+        );
+
+        return toDTO(locatario);
     }
 
     @PostMapping("/contratos")
