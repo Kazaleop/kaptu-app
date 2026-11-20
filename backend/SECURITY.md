@@ -19,7 +19,9 @@ Toda configuração sensível é lida de variáveis de ambiente. O arquivo
 | `DB_PASSWORD` | Sim | Senha do banco. |
 | `JPA_DDL_AUTO` | Não | `validate` (padrão em produção) ou `update` (somente local). |
 | `APP_CORS_ALLOWED_ORIGINS` | Não | Origens permitidas, separadas por vírgula. |
-| `KAPTU_ADMIN_EMAIL` | Não | E-mail do administrador inicial. |
+| `KAPTU_AUTH_ENABLED` | Não | Liga/desliga a autenticação (padrão `true`). |
+| `KAPTU_AUTH_SECRET` | Sim (se auth ligada) | Segredo HMAC-SHA256 (mínimo 32 caracteres). |
+| `KAPTU_AUTH_EXPIRACAO_HORAS` | Não | Validade do token em horas (padrão 8). |
 | `KAPTU_ADMIN_SENHA` | Não | Senha do administrador inicial (mínimo 12 caracteres). |
 | `KAPTU_MAX_FILE_SIZE` / `KAPTU_MAX_REQUEST_SIZE` | Não | Limite de upload (padrão `10MB`). |
 | `KAPTU_PASTA_ARQUIVOS` / `KAPTU_OCR_TESSDATA` | Não | Diretórios de arquivos e dados do OCR. |
