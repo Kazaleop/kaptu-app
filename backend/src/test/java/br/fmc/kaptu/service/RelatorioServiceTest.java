@@ -1,6 +1,8 @@
 
 package br.fmc.kaptu.service;
 
+import br.fmc.kaptu.domain.excecao.RegraDeNegocioExcecao;
+
 import br.fmc.kaptu.domain.financeiro.TipoTransacao;
 import br.fmc.kaptu.domain.financeiro.TransacaoFinanceira;
 import br.fmc.kaptu.repository.TransacaoRepository;
@@ -52,7 +54,7 @@ class RelatorioServiceTest {
                 TipoTransacao.SAIDA
         );
 
-        when(transacaoRepository.findAll())
+        when(transacaoRepository.findByDataTransacaoBetweenOrderByDataTransacaoAsc(any(), any()))
                 .thenReturn(List.of(entrada, saida));
 
         byte[] resultado = relatorioService.gerarRelatorioMpse(
@@ -67,13 +69,13 @@ class RelatorioServiceTest {
             assertTrue(pdf.getNumberOfPages() >= 1);
         }
 
-        verify(transacaoRepository, times(1)).findAll();
+        verify(transacaoRepository, times(1)).findByDataTransacaoBetweenOrderByDataTransacaoAsc(any(), any());
     }
 
     @Test
     void deveGerarPdfMesmoSemTransacoes() throws Exception {
 
-        when(transacaoRepository.findAll())
+        when(transacaoRepository.findByDataTransacaoBetweenOrderByDataTransacaoAsc(any(), any()))
                 .thenReturn(List.of());
 
         byte[] resultado = relatorioService.gerarRelatorioMpse(
@@ -92,7 +94,7 @@ class RelatorioServiceTest {
     void deveRejeitarPeriodoComDataInicialPosterior() {
 
         assertThrows(
-                IllegalArgumentException.class,
+                RegraDeNegocioExcecao.class,
                 () -> relatorioService.gerarRelatorioMpse(
                         LocalDate.of(2026, 11, 30),
                         LocalDate.of(2026, 11, 1)
@@ -106,7 +108,7 @@ class RelatorioServiceTest {
     void deveRejeitarDatasNulas() {
 
         assertThrows(
-                IllegalArgumentException.class,
+                RegraDeNegocioExcecao.class,
                 () -> relatorioService.gerarRelatorioMpse(
                         null,
                         LocalDate.now()

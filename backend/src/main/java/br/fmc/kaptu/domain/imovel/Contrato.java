@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import br.fmc.kaptu.domain.base.Vencivel;
+import br.fmc.kaptu.domain.imovel.IndiceReajuste;
 import br.fmc.kaptu.domain.alerta.TipoAlerta;
 
 @Entity
@@ -34,6 +35,9 @@ public class Contrato extends EntidadeBase implements Vencivel {
     private BigDecimal valorAluguel;
 
     @Enumerated(EnumType.STRING)
+    private IndiceReajuste indiceReajuste;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusContrato statusContrato;
 
@@ -46,7 +50,8 @@ public class Contrato extends EntidadeBase implements Vencivel {
             LocalDate dataExpedicao,
             int prazoMeses,
             LocalDate dataValidade,
-            BigDecimal valorAluguel) {
+            BigDecimal valorAluguel,
+            IndiceReajuste indiceReajuste) {
 
         if (imovel == null || locatario == null) {
             throw new RegraDeNegocioExcecao(
@@ -78,15 +83,18 @@ public class Contrato extends EntidadeBase implements Vencivel {
         this.prazoMeses = prazoMeses;
         this.dataValidade = dataValidade;
         this.valorAluguel = valorAluguel;
+        this.indiceReajuste = indiceReajuste;
         this.statusContrato = StatusContrato.VIGENTE;
 
         this.imovel.ocupar();
     }
 
     public void encerrar() {
-        if (statusContrato != StatusContrato.VIGENTE) {
+        if (statusContrato != StatusContrato.VIGENTE
+                && statusContrato != StatusContrato.VENCIDO) {
             throw new RegraDeNegocioExcecao(
-                    "Somente contratos vigentes podem ser encerrados."
+                    "Somente contratos vigentes ou vencidos "
+                            + "podem ser encerrados."
             );
         }
 
@@ -134,6 +142,10 @@ public class Contrato extends EntidadeBase implements Vencivel {
 
     public BigDecimal getValorAluguel() {
         return valorAluguel;
+    }
+
+    public IndiceReajuste getIndiceReajuste() {
+        return indiceReajuste;
     }
 
     public StatusContrato getStatusContrato() {

@@ -40,6 +40,16 @@ public class AlertaController {
         alertaService.marcarComoLido(id);
     }
 
+    @PostMapping("/verificar")
+    public void verificar() {
+        alertaService.verificarVencimentos();
+    }
+
+    @PatchMapping("/lidos")
+    public void marcarTodosComoLidos() {
+        alertaService.marcarTodosComoLidos();
+    }
+
     private AlertaDTO toDTO(AlertaInteligente alerta) {
         return new AlertaDTO(
                 alerta.getId(),

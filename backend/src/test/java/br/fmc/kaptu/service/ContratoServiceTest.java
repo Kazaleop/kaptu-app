@@ -61,7 +61,8 @@ class ContratoServiceTest {
                 LocalDate.of(2026, 11, 9),
                 12,
                 LocalDate.of(2027, 11, 9),
-                new BigDecimal("1500.00")
+                new BigDecimal("1500.00"),
+                null
         );
     }
 
@@ -90,7 +91,8 @@ class ContratoServiceTest {
                 LocalDate.of(2026, 11, 9),
                 12,
                 LocalDate.of(2027, 11, 9),
-                new BigDecimal("1500.00")
+                new BigDecimal("1500.00"),
+                null
         );
 
         assertEquals(
@@ -127,8 +129,9 @@ class ContratoServiceTest {
                         LocalDate.of(2026, 11, 9),
                         12,
                         LocalDate.of(2027, 11, 9),
-                        new BigDecimal("1500.00")
-                )
+                        new BigDecimal("1500.00"),
+                null
+        )
         );
 
         verify(contratoRepository, never()).save(any());
@@ -149,8 +152,9 @@ class ContratoServiceTest {
                         LocalDate.of(2026, 11, 9),
                         12,
                         LocalDate.of(2027, 11, 9),
-                        new BigDecimal("1500.00")
-                )
+                        new BigDecimal("1500.00"),
+                null
+        )
         );
 
         verify(contratoRepository, never()).save(any());
@@ -174,8 +178,9 @@ class ContratoServiceTest {
                         LocalDate.of(2026, 11, 9),
                         12,
                         LocalDate.of(2027, 11, 9),
-                        new BigDecimal("1500.00")
-                )
+                        new BigDecimal("1500.00"),
+                null
+        )
         );
 
         verify(contratoRepository, never()).save(any());
@@ -188,7 +193,7 @@ class ContratoServiceTest {
         when(contratoRepository.findAll())
                 .thenReturn(List.of(criarContrato(imovel)));
 
-        List<Contrato> resultado = service.listar();
+        List<Contrato> resultado = service.listar(null, null, null);
 
         assertEquals(1, resultado.size());
     }

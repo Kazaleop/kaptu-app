@@ -3,6 +3,7 @@ package br.fmc.kaptu.service;
 
 import br.fmc.kaptu.domain.financeiro.TipoTransacao;
 import br.fmc.kaptu.domain.financeiro.TransacaoFinanceira;
+import br.fmc.kaptu.domain.excecao.RegraDeNegocioExcecao;
 import br.fmc.kaptu.repository.TransacaoRepository;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -48,28 +49,22 @@ public class RelatorioService {
     public byte[] gerarRelatorioMpse(LocalDate inicio, LocalDate fim) {
 
         if (inicio == null || fim == null) {
-            throw new IllegalArgumentException(
+            throw new RegraDeNegocioExcecao(
                     "As datas inicial e final são obrigatórias."
             );
         }
 
         if (inicio.isAfter(fim)) {
-            throw new IllegalArgumentException(
+            throw new RegraDeNegocioExcecao(
                     "A data inicial não pode ser posterior à data final."
             );
         }
 
         List<TransacaoFinanceira> transacoes =
-                transacaoRepository.findAll()
-                        .stream()
-                        .filter(t ->
-                                !t.getDataTransacao().isBefore(inicio)
-                                        && !t.getDataTransacao().isAfter(fim)
-                        )
-                        .sorted((a, b) ->
-                                a.getDataTransacao().compareTo(b.getDataTransacao())
-                        )
-                        .toList();
+                transacaoRepository
+                        .findByDataTransacaoBetweenOrderByDataTransacaoAsc(
+                                inicio, fim
+                        );
 
         BigDecimal entradas = somar(transacoes, TipoTransacao.ENTRADA);
         BigDecimal saidas = somar(transacoes, TipoTransacao.SAIDA);

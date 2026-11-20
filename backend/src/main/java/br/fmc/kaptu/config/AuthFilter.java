@@ -167,7 +167,15 @@ public class AuthFilter extends OncePerRequestFilter {
     private Permissao permissaoPara(String caminho, String metodo) {
         boolean leitura = "GET".equalsIgnoreCase(metodo);
 
-        if (caminho.startsWith("/api/v1/usuarios")) {
+        if (caminho.startsWith("/api/v1/usuarios")
+                || caminho.startsWith("/api/v1/alertas")) {
+            if (leitura) {
+                // alertas listagem = CONSULTAR
+                if (caminho.startsWith("/api/v1/alertas")) {
+                    return Permissao.CONSULTAR;
+                }
+                return Permissao.GERIR_USUARIOS;
+            }
             return Permissao.GERIR_USUARIOS;
         }
 

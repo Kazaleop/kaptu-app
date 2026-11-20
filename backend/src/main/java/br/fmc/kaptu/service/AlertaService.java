@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -63,6 +65,7 @@ public class AlertaService {
         verificarContratos(hoje);
         verificarCertidoes(hoje);
         verificarAnomaliaFinanceira(hoje);
+        verificarSaldoNegativo(hoje);
     }
 
     /**
@@ -132,7 +135,7 @@ public class AlertaService {
 
         long diasRestantes = item.diasParaVencer(hoje);
 
-        if (diasRestantes < 0 || diasRestantes > DIAS_ANTECEDENCIA) {
+        if (diasRestantes > DIAS_ANTECEDENCIA) {
             return;
         }
 
@@ -222,6 +225,50 @@ public class AlertaService {
         );
     }
 
+    private void verificarSaldoNegativo(LocalDate hoje) {
+
+        LocalDate inicioMes = hoje.withDayOfMonth(1);
+
+        BigDecimal entradas = transacaoRepository.somarNoPeriodo(
+                br.fmc.kaptu.domain.financeiro.TipoTransacao.ENTRADA,
+                inicioMes,
+                hoje
+        );
+
+        BigDecimal saidas = transacaoRepository.somarNoPeriodo(
+                br.fmc.kaptu.domain.financeiro.TipoTransacao.SAIDA,
+                inicioMes,
+                hoje
+        );
+
+        if (entradas == null) {
+            entradas = BigDecimal.ZERO;
+        }
+
+        if (saidas == null) {
+            saidas = BigDecimal.ZERO;
+        }
+
+        if (saidas.compareTo(entradas) <= 0) {
+            return;
+        }
+
+        long referenciaId = hoje.getYear() * 100L
+                + hoje.getMonthValue();
+
+        if (alertaRepository.existsByTipoAlertaAndReferenciaId(
+                TipoAlerta.ANOMALIA_FINANCEIRA,
+                referenciaId)) {
+            return;
+        }
+
+        registrarAlerta(
+                TipoAlerta.ANOMALIA_FINANCEIRA,
+                "Saídas do mês superam as entradas.",
+                referenciaId
+        );
+    }
+
     /**
      * Evita alertas duplicados. Se o alerta já foi lido, ele é reativado
      * após {@link #DIAS_REABERTURA} dias, enquanto a condição persistir.
@@ -269,6 +316,18 @@ public class AlertaService {
     @Transactional(readOnly = true)
     public List<AlertaInteligente> listarNaoLidos() {
         return alertaRepository.findByLidoFalseOrderByDataGeracaoDesc();
+    }
+
+    @Transactional
+    public void marcarTodosComoLidos() {
+        for (AlertaInteligente alerta : alertaRepository.findAll()) {
+            alerta.marcarComoLido();
+        }
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void aoIniciar() {
+        verificarVencimentos();
     }
 
     @Transactional
