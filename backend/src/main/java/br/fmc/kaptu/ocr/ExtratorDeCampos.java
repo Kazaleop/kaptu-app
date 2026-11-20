@@ -1,4 +1,3 @@
-
 package br.fmc.kaptu.ocr;
 
 import br.fmc.kaptu.domain.documento.TipoDocumento;
@@ -79,6 +78,9 @@ public class ExtratorDeCampos {
         adicionar(campos, "numeroNota", numero);
 
         adicionarValor(campos, "valorTotal", texto);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void extrairContrato(
@@ -97,6 +99,9 @@ public class ExtratorDeCampos {
         adicionar(campos, "dataValidade", converterData(data));
 
         adicionarValor(campos, "valorAluguel", texto);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void extrairRecibo(
@@ -124,6 +129,9 @@ public class ExtratorDeCampos {
         adicionar(campos, "numTransacao", transacao);
 
         adicionarValor(campos, "valor", texto);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void extrairCertidao(
@@ -148,6 +156,9 @@ public class ExtratorDeCampos {
         );
 
         adicionar(campos, "orgaoEmissor", orgao);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void adicionarValor(
@@ -179,11 +190,12 @@ public class ExtratorDeCampos {
         }
     }
 
-    /**
-     * Retorna a última data do texto. Em contratos e certidões a data de
-     * validade é a data final, então usar a primeira data lia a data de
-     * emissão/início por engano.
-     */
+    private String primeiraData(String texto) {
+        Matcher matcher = DATA.matcher(texto);
+
+        return matcher.find() ? matcher.group(1) : null;
+    }
+
     private String ultimaData(String texto) {
         Matcher matcher = DATA.matcher(texto);
 

@@ -44,6 +44,10 @@ export interface DocumentoDTO {
   textoExtraido: string | null
   /** Imóvel vinculado no upload (null quando não informado) */
   imovelId: number | null
+  imovelNome: string | null
+  dataValidade: string | null
+  criadoEm: string
+  possuiArquivo: boolean
 }
 
 /** Filtros enviados ao backend (query string de /documentos e /documentos/filtros). */

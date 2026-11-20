@@ -26,7 +26,7 @@ public abstract class Documento extends EntidadeBase {
     private StatusClassificacao statusClassificacao =
             StatusClassificacao.PENDENTE;
 
-    @Column(length = 10000)
+    @Column(columnDefinition = "TEXT")
     private String textoExtraido;
 
     private BigDecimal valorReferencia;
@@ -46,7 +46,7 @@ public abstract class Documento extends EntidadeBase {
             Map<String, String> campos
     );
 
-    protected void definirValorReferencia(BigDecimal valor) {
+    public void definirValorReferencia(BigDecimal valor) {
         this.valorReferencia = valor;
     }
 

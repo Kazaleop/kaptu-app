@@ -82,7 +82,8 @@ public class DocumentoService {
     public Documento processarUploadComOCR(
             MultipartFile arquivo,
             TipoDocumento tipoInformado,
-            Long imovelId) {
+            Long imovelId,
+            LocalDate dataEmissaoInformada) {
 
         validarArquivo(arquivo);
 
@@ -106,26 +107,70 @@ public class DocumentoService {
 
             arquivo.transferTo(destino.toFile());
 
-            String texto = extrairTexto(destino);
+            String texto = null;
+
+            try {
+                texto = extrairTexto(destino);
+            } catch (RegraDeNegocioExcecao e) {
+                log.warn(
+                        "Não foi possível extrair texto do arquivo {}: {}",
+                        nomeOriginal,
+                        e.getMessage()
+                );
+                texto = null;
+            }
 
             TipoDocumento tipo = tipoInformado != null
                     ? tipoInformado
-                    : classificador.classificar(texto);
+                    : (texto == null || texto.isBlank()
+                    ? TipoDocumento.RECIBO
+                    : classificador.classificar(texto));
 
             Documento documento = documentoFactory.criar(tipo);
 
             documento.definirTitulo(nomeOriginal);
-            documento.definirTextoExtraido(texto);
             documento.definirImovel(imovel);
 
-            Map<String, String> campos =
-                    extratorDeCampos.extrair(texto, tipo);
+            if (texto != null && !texto.isBlank()) {
+                documento.definirTextoExtraido(texto);
 
-            documento.aplicarCamposExtraidos(campos);
+                Map<String, String> campos =
+                        extratorDeCampos.extrair(texto, tipo);
 
-            if (documento.getStatusClassificacao()
-                    == StatusClassificacao.PENDENTE) {
-                documento.marcarClassificado();
+                documento.aplicarCamposExtraidos(campos);
+
+                String dataEmissao = campos.get("dataEmissao");
+
+                if (documento.getDataEmissao() == null
+                        && dataEmissao != null) {
+                    try {
+                        documento.definirDataEmissao(
+                                LocalDate.parse(dataEmissao)
+                        );
+                    } catch (Exception ignored) {
+                    }
+                }
+
+                if (documento.getStatusClassificacao()
+                        == StatusClassificacao.PENDENTE) {
+                    documento.marcarClassificado();
+                }
+
+            } else {
+                documento.registrarErro();
+            }
+
+            if (dataEmissaoInformada != null) {
+                documento.definirDataEmissao(dataEmissaoInformada);
+            }
+
+            if (documento.getDataEmissao() == null) {
+                documento.definirDataEmissao(LocalDate.now());
+
+                if (documento.getStatusClassificacao()
+                        != StatusClassificacao.ERRO) {
+                    documento.enviarParaRevisaoManual();
+                }
             }
 
             caminhoEnviado = nomeSalvo;
@@ -308,6 +353,7 @@ public class DocumentoService {
             Long imovelId,
             BigDecimal valorMinimo,
             BigDecimal valorMaximo,
+            String busca,
             Pageable pageable) {
 
         validarFiltros(dataInicio, dataFim, valorMinimo, valorMaximo);
@@ -318,7 +364,8 @@ public class DocumentoService {
                         .and(DocumentoSpecifications.porImovel(imovelId))
                         .and(DocumentoSpecifications.valorEntre(
                                 valorMinimo, valorMaximo
-                        ));
+                        ))
+                        .and(DocumentoSpecifications.porBusca(busca));
 
         return documentoRepository.findAll(especificacao, pageable);
     }

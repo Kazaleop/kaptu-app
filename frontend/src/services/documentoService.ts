@@ -48,6 +48,10 @@ export const documentoService = {
         resumo: null,
         textoExtraido: null,
         imovelId: imovelId ?? null,
+        imovelNome: null,
+        dataValidade: null,
+        criadoEm: new Date().toISOString(),
+        possuiArquivo: true,
       }
       mockDocumentos.unshift(novo)
       return delay(novo, 1200)
