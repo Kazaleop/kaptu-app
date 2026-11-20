@@ -1,0 +1,15 @@
+$kind: http-request
+name: Marcar Alerta como Lido
+method: PATCH
+url: '{{base_url}}/api/v1/alertas/:id/lido'
+order: 3000
+pathVariables:
+  - key: id
+    value: "1"
+    description: ""
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));

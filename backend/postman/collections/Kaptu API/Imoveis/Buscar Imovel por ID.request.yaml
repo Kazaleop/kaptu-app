@@ -1,0 +1,19 @@
+$kind: http-request
+name: Buscar Imóvel por ID
+method: GET
+url: '{{base_url}}/api/v1/imoveis/:id'
+order: 3000
+pathVariables:
+  id: "1"
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 ou 404", () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));
+      pm.test("Content-Type é JSON", () => pm.response.to.have.header("Content-Type", /application\/json/));
+      if (pm.response.code === 200) {
+        const json = pm.response.json();
+        pm.test("Tem id", () => pm.expect(json).to.have.property("id"));
+        pm.test("Tem nome", () => pm.expect(json).to.have.property("nome"));
+      }

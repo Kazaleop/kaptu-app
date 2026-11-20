@@ -1,0 +1,18 @@
+$kind: http-request
+name: Upload de Documento (OCR)
+method: POST
+url: "{{base_url}}/api/v1/documentos/upload"
+order: 1000
+body:
+  type: formdata
+  content:
+    - type: file
+      key: arquivo
+      src:
+        - /C:/Users/ggdos/Downloads/minha-claro-fatura.pdf
+      disabled: false
+    - type: text
+      key: tipo
+      value: NOTA_FISCAL
+      description: "Optional. Possible values: NOTA_FISCAL, RECIBO, CERTIDAO, CONTRATO"
+      disabled: false

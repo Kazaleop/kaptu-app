@@ -1,0 +1,29 @@
+$kind: http-request
+name: Criar Contrato
+method: POST
+url: '{{base_url}}/api/v1/contratos'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "imovelId": 1,
+      "locatarioId": 1,
+      "prazoMeses": 12,
+      "valorAluguel": 1500.00,
+      "dataExpedicao": "2026-01-01"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 ou 201", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));
+      pm.test("Content-Type é JSON", () => pm.response.to.have.header("Content-Type", /application\/json/));
+      const json = pm.response.json();
+      pm.test("Resposta tem id", () => pm.expect(json).to.have.property("id"));
+      pm.test("imovelId corresponde ao enviado", () => pm.expect(json.imovelId).to.eql(1));
+      pm.test("locatarioId corresponde ao enviado", () => pm.expect(json.locatarioId).to.eql(1));

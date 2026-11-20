@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens do design Kaptu (extraídos do Figma).
+ * Cada token vira uma classe Tailwind, ex.: --color-primary -> bg-primary / text-primary.
+ * Para mudar uma cor no sistema inteiro, altere só aqui.
+ */
+@theme {
+  --font-sans: 'Segoe UI', 'Segoe UI Variable', system-ui, -apple-system, Helvetica, Arial, sans-serif;
+
+  /* Marca */
+  --color-primary: #4b22ba;
+  --color-primary-hover: #3e1c9b;
+  --color-primary-text: #5632ae;
+  --color-primary-soft: #f0ecf8;
+  --color-accent: #ffd42a;
+
+  /* Superfícies e bordas */
+  --color-background: #f7f5fb;
+  --color-surface: #ffffff;
+  --color-border: #e6e0f0;
+  --color-divider: #ebe6f3;
+  --color-chip: #eeeaf7;
+
+  /* Texto */
+  --color-text: #29213f;
+  --color-muted: #777086;
+  --color-subtle: #8a829c;
+  --color-eyebrow: #7765a8;
+
+  /* Ícones dos cards */
+  --color-icon-violet: #eee8ff;
+  --color-icon-yellow: #fff4bd;
+  --color-icon-lilac: #e8e2ff;
+  --color-icon-orange: #fff0dc;
+
+  /* Alertas e status */
+  --color-alert-orange: #ff8a24;
+  --color-alert-amber: #f2b91f;
+  --color-alert-purple: #8b72dd;
+  --color-badge-bg: #fff2d4;
+  --color-badge-text: #a66800;
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-danger: #c2410c;
+
+  --shadow-card: 0px 2px 10px #153a3409;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-text font-sans antialiased;
+  }
+}
+
+@utility eyebrow {
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--color-eyebrow);
+}
+
+@utility bg-sidebar {
+  background-image: linear-gradient(180deg, #4d19d6 0%, #3b248f 50%, #29235d 100%);
+}

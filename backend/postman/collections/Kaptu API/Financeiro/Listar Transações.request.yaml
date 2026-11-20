@@ -1,0 +1,20 @@
+$kind: http-request
+name: 'Listar Transações'
+url: '{{base_url}}/api/v1/financeiro/transacoes'
+method: GET
+order: 2000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));
+      pm.test("Content-Type é JSON", () => pm.response.to.have.header("Content-Type", /application\/json/));
+      pm.test("Corpo é um array", () => pm.expect(pm.response.json()).to.be.an("array"));
+      const arr = pm.response.json();
+      if (arr.length > 0) {
+        pm.test("Item tem id", () => pm.expect(arr[0]).to.have.property("id"));
+        pm.test("Item tem valor", () => pm.expect(arr[0]).to.have.property("valor"));
+        pm.test("Item tem tipoTransacao", () => pm.expect(arr[0]).to.have.property("tipoTransacao"));
+        pm.test("Item tem statusConciliacao", () => pm.expect(arr[0]).to.have.property("statusConciliacao"));
+      }

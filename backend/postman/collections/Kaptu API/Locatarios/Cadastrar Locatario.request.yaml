@@ -1,0 +1,27 @@
+$kind: http-request
+name: 'Cadastrar Locatário'
+method: POST
+url: '{{base_url}}/api/v1/locatarios'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nome": "João Silva",
+      "cpfCnpj": "123.456.789-00",
+      "telefone": "(81) 99999-0000",
+      "email": "joao.silva@email.com"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 ou 201", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));
+      pm.test("Content-Type é JSON", () => pm.response.to.have.header("Content-Type", /application\/json/));
+      const json = pm.response.json();
+      pm.test("Tem id", () => pm.expect(json).to.have.property("id"));
+      pm.test("nome corresponde ao enviado", () => pm.expect(json.nome).to.eql("João Silva"));

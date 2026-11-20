@@ -1,0 +1,27 @@
+$kind: http-request
+name: 'Lançar Transação'
+url: '{{base_url}}/api/v1/financeiro/transacoes'
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "descricao": "Pagamento de aluguel",
+      "valor": 2000.00,
+      "dataTransacao": "2026-11-16",
+      "tipoTransacao": "ENTRADA"
+    }
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 ou 201", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));
+      pm.test("Content-Type é JSON", () => pm.response.to.have.header("Content-Type", /application\/json/));
+      const json = pm.response.json();
+      pm.test("Tem id", () => pm.expect(json).to.have.property("id"));
+      pm.test("tipoTransacao corresponde ao enviado", () => pm.expect(json.tipoTransacao).to.eql("ENTRADA"));

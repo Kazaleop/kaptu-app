@@ -1,0 +1,8 @@
+export { api, ApiError } from './api'
+export { alertaService } from './alertaService'
+export { contratoService } from './contratoService'
+export { dashboardService } from './dashboardService'
+export { documentoService } from './documentoService'
+export { codigoTransacao, financeiroService, mesesDoPeriodo } from './financeiroService'
+export { imovelService } from './imovelService'
+export { locatarioService } from './locatarioService'

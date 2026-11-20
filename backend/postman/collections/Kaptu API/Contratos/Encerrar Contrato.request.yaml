@@ -1,0 +1,13 @@
+$kind: http-request
+name: Encerrar Contrato
+method: POST
+url: '{{base_url}}/api/v1/contratos/:id/encerrar'
+order: 3000
+pathVariables:
+  id: "1"
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));

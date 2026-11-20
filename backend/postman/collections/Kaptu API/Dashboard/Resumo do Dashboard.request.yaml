@@ -1,0 +1,17 @@
+$kind: http-request
+name: Resumo do Dashboard
+method: GET
+url: '{{base_url}}/api/v1/dashboard/resumo'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));
+      pm.test("Content-Type é JSON", () => pm.response.to.have.header("Content-Type", /application\/json/));
+      const json = pm.response.json();
+      pm.test("Tem totalImoveis", () => pm.expect(json).to.have.property("totalImoveis"));
+      pm.test("Tem contratosVigentes", () => pm.expect(json).to.have.property("contratosVigentes"));
+      pm.test("Tem alertasNaoLidos", () => pm.expect(json).to.have.property("alertasNaoLidos"));
+      pm.test("Tem saldoMes", () => pm.expect(json).to.have.property("saldoMes"));

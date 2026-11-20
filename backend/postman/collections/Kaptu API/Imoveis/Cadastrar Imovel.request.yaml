@@ -1,0 +1,27 @@
+$kind: http-request
+name: Cadastrar Imóvel
+method: POST
+url: '{{base_url}}/api/v1/imoveis'
+order: 1000
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nome": "Apartamento SubPraça",
+      "endereco": "Rua das Calçadas, 321",
+      "bairro": "SubPraça",
+      "quantResidentes": 4,
+      "valorAluguelMensal": 2100.00
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 ou 201", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));
+      pm.test("Resposta em menos de 2000ms", () => pm.expect(pm.response.responseTime).to.be.below(2000));
+      pm.test("Content-Type é JSON", () => pm.response.to.have.header("Content-Type", /application\/json/));
+      const json = pm.response.json();
+      pm.test("Tem id", () => pm.expect(json).to.have.property("id"));
+      pm.test("nome corresponde ao enviado", () => pm.expect(json.nome).to.eql("Apartamento SubPraça"));
