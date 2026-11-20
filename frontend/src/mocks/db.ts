@@ -24,10 +24,10 @@ export const mockDb: {
     { id: 4, nome: 'Paula Lima', cpfCnpj: '44455566677', telefone: '79999990044', email: 'paula@exemplo.com', dataCadastro: diasAPartirDeHoje(-250) },
   ],
   contratos: [
-    { id: 1, imovelId: 1, imovel: 'Edifício Sede — Sala 204', locatario: 'Marcos Carvalho', status: 'VIGENTE', valor: 4800, dataValidade: diasAPartirDeHoje(305) },
-    { id: 2, imovelId: 2, imovel: 'Casa Institucional 037', locatario: 'Ana Ribeiro', status: 'VIGENTE', valor: 3250, dataValidade: diasAPartirDeHoje(5) },
-    { id: 3, imovelId: 3, imovel: 'Loja Comercial 015', locatario: 'João Santos', status: 'EM_RENOVACAO', valor: 2900, dataValidade: diasAPartirDeHoje(22) },
-    { id: 4, imovelId: 4, imovel: 'Galpão 078', locatario: 'Paula Lima', status: 'VIGENTE', valor: 6400, dataValidade: diasAPartirDeHoje(190) },
+    { id: 1, imovelId: 1, locatarioId: 1, imovel: 'Edifício Sede — Sala 204', locatario: 'Marcos Carvalho', status: 'VIGENTE', valor: 4800, dataExpedicao: diasAPartirDeHoje(-305), prazoMeses: 365, dataValidade: diasAPartirDeHoje(305) },
+    { id: 2, imovelId: 2, locatarioId: 2, imovel: 'Casa Institucional 037', locatario: 'Ana Ribeiro', status: 'VIGENTE', valor: 3250, dataExpedicao: diasAPartirDeHoje(-5), prazoMeses: 12, dataValidade: diasAPartirDeHoje(5) },
+    { id: 3, imovelId: 3, locatarioId: 3, imovel: 'Loja Comercial 015', locatario: 'João Santos', status: 'EM_RENOVACAO', valor: 2900, dataExpedicao: diasAPartirDeHoje(-22), prazoMeses: 12, dataValidade: diasAPartirDeHoje(22) },
+    { id: 4, imovelId: 4, locatarioId: 4, imovel: 'Galpão 078', locatario: 'Paula Lima', status: 'VIGENTE', valor: 6400, dataExpedicao: diasAPartirDeHoje(-190), prazoMeses: 12, dataValidade: diasAPartirDeHoje(190) },
   ],
 }
 

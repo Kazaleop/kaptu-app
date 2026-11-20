@@ -2,6 +2,7 @@
 package br.fmc.kaptu.domain.alerta;
 
 import br.fmc.kaptu.domain.base.EntidadeBase;
+import br.fmc.kaptu.domain.excecao.RegraDeNegocioExcecao;
 
 import jakarta.persistence.*;
 
@@ -36,7 +37,7 @@ public class AlertaInteligente extends EntidadeBase {
     ) {
         if (tipoAlerta == null || mensagem == null
                 || mensagem.isBlank() || referenciaId == null) {
-            throw new IllegalArgumentException(
+            throw new RegraDeNegocioExcecao(
                     "Os dados do alerta são obrigatórios."
             );
         }

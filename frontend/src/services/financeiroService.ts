@@ -13,7 +13,6 @@ import type {
 } from '@/types'
 import { toIsoDate } from '@/utils/format'
 import { api, ApiError } from './api'
-import { dashboardService } from './dashboardService'
 import { documentoService } from './documentoService'
 
 /** "6" -> 6 | "12" -> 12 | "ano" -> meses decorridos no ano atual */
@@ -27,9 +26,6 @@ export interface ArquivoGerado {
   nome: string
 }
 
-const anoMes = (iso: string) => iso.slice(0, 7)
-
-/** Mais recentes primeiro (data e, no empate, id). */
 const porDataDesc = (a: TransacaoDTO, b: TransacaoDTO) =>
   b.dataTransacao.localeCompare(a.dataTransacao) || b.id - a.id
 
@@ -68,20 +64,44 @@ export const financeiroService = {
    * contada sobre todas as transações.
    */
   async resumo(): Promise<FinanceiroResumo> {
-    const [dashboard, transacoes] = await Promise.all([
-      usarMock('financeiroResumo') ? delay(mockDashboard) : dashboardService.resumo(),
-      financeiroService.transacoes(),
-    ])
-    const conciliadas = transacoes.filter((t) => t.statusConciliacao === 'CONCILIADA').length
+    if (usarMock('financeiroResumo')) {
+      const [dashboard, transacoes] = await Promise.all([
+        delay(mockDashboard),
+        financeiroService.transacoes(),
+      ])
+      const conciliadas = transacoes.filter((t) => t.statusConciliacao === 'CONCILIADA').length
+      return {
+        mesReferencia: toIsoDate(new Date()).slice(0, 7),
+        receitaMes: dashboard.entradasMes,
+        despesaMes: dashboard.saidasMes,
+        saldoMes: dashboard.saldoMes,
+        transacoesConciliadas: conciliadas,
+        totalTransacoes: transacoes.length,
+        percentualConciliado: transacoes.length ? (conciliadas / transacoes.length) * 100 : 100,
+        pendencias: transacoes.length - conciliadas,
+      }
+    }
+    const hoje = new Date()
+    const inicio = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-01`
+    const fim = toIsoDate(hoje)
+    const { data } = await api.get<{
+      receitas: number
+      despesas: number
+      saldo: number
+      totalTransacoes: number
+      conciliadas: number
+      pendentes: number
+      percentualConciliado: number
+    }>('/financeiro/resumo', { params: { inicio, fim } })
     return {
-      mesReferencia: toIsoDate(new Date()).slice(0, 7),
-      receitaMes: dashboard.entradasMes,
-      despesaMes: dashboard.saidasMes,
-      saldoMes: dashboard.saldoMes,
-      transacoesConciliadas: conciliadas,
-      totalTransacoes: transacoes.length,
-      percentualConciliado: transacoes.length ? (conciliadas / transacoes.length) * 100 : 100,
-      pendencias: transacoes.length - conciliadas,
+      mesReferencia: inicio.slice(0, 7),
+      receitaMes: data.receitas,
+      despesaMes: data.despesas,
+      saldoMes: data.saldo,
+      transacoesConciliadas: data.conciliadas,
+      totalTransacoes: data.totalTransacoes,
+      percentualConciliado: data.percentualConciliado,
+      pendencias: data.pendentes,
     }
   },
 
@@ -90,20 +110,11 @@ export const financeiroService = {
     const meses = mesesDoPeriodo(periodo)
     if (usarMock('financeiroFluxo')) return delay(gerarFluxoMensal(meses))
 
-    const transacoes = await financeiroService.transacoes()
-    const hoje = new Date()
-    const serie: FluxoMensal[] = Array.from({ length: meses }, (_, i) => {
-      const d = new Date(hoje.getFullYear(), hoje.getMonth() - (meses - 1 - i), 1)
-      return { mes: toIsoDate(d).slice(0, 7), receitas: 0, despesas: 0 }
-    })
-    const porMes = new Map(serie.map((m) => [m.mes, m]))
-    for (const t of transacoes) {
-      const mes = porMes.get(anoMes(t.dataTransacao))
-      if (!mes) continue
-      if (t.tipoTransacao === 'ENTRADA') mes.receitas += t.valor
-      else mes.despesas += t.valor
-    }
-    return serie
+    const { data } = await api.get<{ mes: string; receitas: number; despesas: number }[]>(
+      '/financeiro/fluxo-mensal',
+      { params: { meses } },
+    )
+    return data.map((d) => ({ mes: d.mes, receitas: d.receitas, despesas: d.despesas }))
   },
 
   /** POST /api/v1/financeiro/conciliar */
