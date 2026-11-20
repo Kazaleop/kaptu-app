@@ -48,10 +48,16 @@ public class DocumentoController {
     public ResponseEntity<DocumentoDTO> enviarDocumento(
             @RequestParam("arquivo") MultipartFile arquivo,
             @RequestParam(value = "tipo", required = false)
-            TipoDocumento tipo) {
+            TipoDocumento tipo,
+            @RequestParam(value = "imovelId", required = false)
+            Long imovelId) {
 
         Documento documento =
-                documentoService.processarUploadComOCR(arquivo, tipo);
+                documentoService.processarUploadComOCR(
+                        arquivo,
+                        tipo,
+                        imovelId
+                );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

@@ -5,10 +5,10 @@ import type { DocumentoDTO, FiltrosDocumentosApi, TipoDocumento } from '@/types'
  * Fica em memória: um PDF "importado" aparece na lista até recarregar a página.
  */
 const base: Omit<DocumentoDTO, 'id'>[] = [
-  { titulo: 'Contrato de locação — Sala 204', tipo: 'CONTRATO', dataEmissao: '2026-09-18', valorReferencia: 4800, statusClassificacao: 'CLASSIFICADO', resumo: 'Documento de contrato - válido até 18/09/2027', textoExtraido: null },
-  { titulo: 'Nota fiscal — Manutenção elétrica', tipo: 'NOTA_FISCAL', dataEmissao: '2026-09-16', valorReferencia: 8420, statusClassificacao: 'CLASSIFICADO', resumo: 'Nota fiscal 0928 - Valor: 8420.00', textoExtraido: null },
-  { titulo: 'Certidão negativa municipal', tipo: 'CERTIDAO', dataEmissao: '2026-09-12', valorReferencia: null, statusClassificacao: 'REVISAO_MANUAL', resumo: 'Certidão MUNICIPAL - Válida até 2026-12-12', textoExtraido: null },
-  { titulo: 'Recibo de aluguel — Setembro', tipo: 'RECIBO', dataEmissao: '2026-09-10', valorReferencia: 2900, statusClassificacao: 'CLASSIFICADO', resumo: 'Recibo - Loja Comercial 015 - Valor: 2900.00', textoExtraido: null },
+  { titulo: 'Contrato de locação — Sala 204', tipo: 'CONTRATO', dataEmissao: '2026-09-18', valorReferencia: 4800, statusClassificacao: 'CLASSIFICADO', resumo: 'Documento de contrato - válido até 18/09/2027', textoExtraido: null, imovelId: 1 },
+  { titulo: 'Nota fiscal — Manutenção elétrica', tipo: 'NOTA_FISCAL', dataEmissao: '2026-09-16', valorReferencia: 8420, statusClassificacao: 'CLASSIFICADO', resumo: 'Nota fiscal 0928 - Valor: 8420.00', textoExtraido: null, imovelId: 1 },
+  { titulo: 'Certidão negativa municipal', tipo: 'CERTIDAO', dataEmissao: '2026-09-12', valorReferencia: null, statusClassificacao: 'REVISAO_MANUAL', resumo: 'Certidão MUNICIPAL - Válida até 2026-12-12', textoExtraido: null, imovelId: 3 },
+  { titulo: 'Recibo de aluguel — Setembro', tipo: 'RECIBO', dataEmissao: '2026-09-10', valorReferencia: 2900, statusClassificacao: 'CLASSIFICADO', resumo: 'Recibo - Loja Comercial 015 - Valor: 2900.00', textoExtraido: null, imovelId: 3 },
 ]
 
 const nomes: Record<TipoDocumento, string[]> = {
@@ -32,17 +32,21 @@ const gerados: Omit<DocumentoDTO, 'id'>[] = Array.from({ length: 38 }, (_, i) =>
     statusClassificacao: i % 7 === 3 ? 'REVISAO_MANUAL' : 'CLASSIFICADO',
     resumo: null,
     textoExtraido: null,
+    imovelId: (i % 4) + 1,
   }
 })
 
 export const mockDocumentos: DocumentoDTO[] = [...base, ...gerados].map((d, i) => ({ ...d, id: i + 1 }))
 
-/** Imita GET /documentos/filtros (o filtro por imóvel não tem efeito nos dados de exemplo). */
+/** Imita GET /documentos/filtros, inclusive o filtro por imóvel e faixa de valor. */
 export function filtrarMockDocumentos(f: FiltrosDocumentosApi): DocumentoDTO[] {
   return mockDocumentos.filter(
     (d) =>
       (!f.tipo || d.tipo === f.tipo) &&
+      (!f.imovelId || d.imovelId === f.imovelId) &&
       (!f.dataInicio || (d.dataEmissao !== null && d.dataEmissao >= f.dataInicio)) &&
-      (!f.dataFim || (d.dataEmissao !== null && d.dataEmissao <= f.dataFim)),
+      (!f.dataFim || (d.dataEmissao !== null && d.dataEmissao <= f.dataFim)) &&
+      (f.valorMinimo === undefined || (d.valorReferencia !== null && d.valorReferencia >= f.valorMinimo)) &&
+      (f.valorMaximo === undefined || (d.valorReferencia !== null && d.valorReferencia <= f.valorMaximo)),
   )
 }

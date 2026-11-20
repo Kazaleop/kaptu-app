@@ -15,7 +15,11 @@ export const locatarioService = {
   /** POST /api/v1/locatarios -> 201 com LocatarioDTO */
   async cadastrar(request: LocatarioRequest): Promise<LocatarioDTO> {
     if (env.useMocks) {
-      const novo: LocatarioDTO = { ...request, id: nextId(mockDb.locatarios) }
+      const novo: LocatarioDTO = {
+        ...request,
+        id: nextId(mockDb.locatarios),
+        dataCadastro: new Date().toISOString(),
+      }
       mockDb.locatarios.push(novo)
       return delay(novo)
     }

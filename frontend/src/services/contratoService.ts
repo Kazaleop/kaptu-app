@@ -2,8 +2,12 @@ import { usarMock } from '@/config/endpoints'
 import { env } from '@/config/env'
 import { mockContratosAVencer } from '@/mocks/dashboard'
 import { delay, mockDb, nextId } from '@/mocks/db'
-import type { AlertaDTO, ContratoLinhaDTO, ContratoRequest } from '@/types'
+import type { AlertaDTO, ContratoLinhaDTO, ContratoRequest, StatusContrato } from '@/types'
+import { somarMeses, toIsoDate } from '@/utils/format'
 import { api, ApiError } from './api'
+
+/** Status que ainda ocupam o imóvel e contam como contrato em andamento. */
+const STATUS_ATIVOS: StatusContrato[] = ['VIGENTE', 'EM_RENOVACAO']
 
 /** Endpoints de ImobiliarioController relativos a contratos. */
 export const contratoService = {
@@ -24,12 +28,15 @@ export const contratoService = {
       const locatario = mockDb.locatarios.find((l) => l.id === request.locatarioId)
       if (!imovel || !locatario) throw new ApiError('Imóvel ou locatário não encontrado.', 404)
       imovel.statusOcupacao = 'OCUPADO'
+      const dataExpedicao = request.dataExpedicao ?? toIsoDate(new Date())
       const novo: ContratoLinhaDTO = {
         id: nextId(mockDb.contratos),
+        imovelId: imovel.id,
         imovel: imovel.nome,
         locatario: locatario.nome,
         status: 'VIGENTE',
         valor: request.valorAluguel,
+        dataValidade: somarMeses(dataExpedicao, request.prazoMeses),
       }
       mockDb.contratos.push(novo)
       return delay(novo)
@@ -50,7 +57,9 @@ export const contratoService = {
       api.get<AlertaDTO[]>('/alertas'),
       api.get<ContratoLinhaDTO[]>('/contratos'),
     ])
-    const vigentes = new Set(contratos.filter((c) => c.status === 'VIGENTE').map((c) => c.id))
+    const vigentes = new Set(
+      contratos.filter((c) => STATUS_ATIVOS.includes(c.status)).map((c) => c.id),
+    )
     const aVencer = new Set(
       alertas
         .filter((a) => a.tipo === 'CONTRATO_A_VENCER' && vigentes.has(a.referenciaId))

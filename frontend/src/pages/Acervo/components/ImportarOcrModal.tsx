@@ -107,7 +107,6 @@ function Formulario({ onClose }: { onClose(): void }) {
           hint={upload.descricao}
         />
         <div className="grid grid-cols-2 gap-4">
-          {/* ⚠ O backend ainda não grava o imóvel no upload (campo enviado para quando existir) */}
           <Select
             label="Localização"
             placeholder="Selecione"

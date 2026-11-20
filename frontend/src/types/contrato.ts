@@ -2,20 +2,18 @@ import type { StatusContrato } from './enums'
 
 /**
  * web/dto/ContratoLinhaDTO.java (resposta de GET/POST /contratos)
- * Atenção: "imovel" e "locatario" vêm como NOMES (string), não objetos.
+ * "imovel" e "locatario" vêm como NOMES (string), não objetos.
+ * Use "imovelId" para ligar o contrato ao imóvel da tela.
  */
 export interface ContratoLinhaDTO {
   id: number
+  imovelId: number
   imovel: string
   locatario: string
   status: StatusContrato
   valor: number
-  /**
-   * ⚠ CAMPO PROPOSTO (ainda não existe no DTO Java).
-   * LocalDate "AAAA-MM-DD". Quando o backend incluir, a tabela da
-   * Gestão imobiliária passa a mostrar "Vence em N dias" automaticamente.
-   */
-  dataValidade?: string
+  /** LocalDate "AAAA-MM-DD" calculada pelo backend (dataExpedicao + prazoMeses). */
+  dataValidade: string
 }
 
 /** Índices de reajuste oferecidos no popup "Novo contrato de aluguel". */
@@ -42,9 +40,9 @@ export interface ContratoRequest {
    */
   dataExpedicao?: string
   /**
-   * ⚠ CAMPO PROPOSTO (ainda não existe no DTO Java).
-   * Enviado mesmo assim: o Spring ignora campos desconhecidos,
-   * e passa a gravar quando o backend adicionar o campo.
+   * Informativo: o backend atual não persiste o índice de reajuste.
+   * O campo continua opcional para não quebrar a tela enquanto o
+   * domínio não tiver essa coluna.
    */
   indiceReajuste?: IndiceReajuste
 }

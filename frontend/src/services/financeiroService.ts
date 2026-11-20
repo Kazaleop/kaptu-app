@@ -1,6 +1,6 @@
 import { usarMock } from '@/config/endpoints'
 import { gerarFluxoMensal, mockDashboard } from '@/mocks/dashboard'
-import { delay } from '@/mocks/db'
+import { delay, nextId } from '@/mocks/db'
 import { mockTransacoes } from '@/mocks/financeiro'
 import type {
   AnexarComprovanteRequest,
@@ -45,6 +45,19 @@ export const financeiroService = {
 
   /** POST /api/v1/financeiro/transacoes (sem tela no design por enquanto) */
   async lancar(request: TransacaoCriacaoRequest): Promise<TransacaoDTO> {
+    if (usarMock('financeiroTransacoes')) {
+      const nova: TransacaoDTO = {
+        id: nextId(mockTransacoes),
+        descricao: request.descricao,
+        valor: request.valor,
+        dataTransacao: request.dataTransacao,
+        tipoTransacao: request.tipoTransacao,
+        statusConciliacao: 'PENDENTE',
+        documentoId: null,
+      }
+      mockTransacoes.unshift(nova)
+      return delay(nova)
+    }
     const { data } = await api.post<TransacaoDTO>('/financeiro/transacoes', request)
     return data
   },
@@ -95,6 +108,13 @@ export const financeiroService = {
 
   /** POST /api/v1/financeiro/conciliar */
   async conciliar(request: ConciliacaoRequest): Promise<TransacaoDTO> {
+    if (usarMock('financeiroComprovante')) {
+      const t = mockTransacoes.find((x) => x.id === request.transacaoId)
+      if (!t) throw new ApiError('Transação não encontrada.', 404)
+      t.statusConciliacao = 'CONCILIADA'
+      t.documentoId = request.documentoId
+      return delay(t)
+    }
     const { data } = await api.post<TransacaoDTO>('/financeiro/conciliar', request)
     return data
   },

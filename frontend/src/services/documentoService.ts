@@ -47,6 +47,7 @@ export const documentoService = {
         valorReferencia: null,
         resumo: null,
         textoExtraido: null,
+        imovelId: imovelId ?? null,
       }
       mockDocumentos.unshift(novo)
       return delay(novo, 1200)
@@ -55,7 +56,7 @@ export const documentoService = {
     const form = new FormData()
     form.append('arquivo', arquivo)
     if (tipo) form.append('tipo', tipo)
-    if (imovelId) form.append('imovelId', String(imovelId)) // ⚠ ainda ignorado pelo backend
+    if (imovelId) form.append('imovelId', String(imovelId))
     const { data } = await api.post<DocumentoDTO>('/documentos/upload', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 180_000, // OCR de PDF escaneado pode demorar

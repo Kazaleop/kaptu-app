@@ -43,6 +43,7 @@ export const statusOcupacaoLabel: Record<StatusOcupacao, { label: string; varian
 
 export const statusContratoLabel: Record<StatusContrato, { label: string; variant: BadgeVariant }> = {
   VIGENTE: { label: 'Contrato ativo', variant: 'primary' },
+  EM_RENOVACAO: { label: 'Em renovação', variant: 'warning' },
   VENCIDO: { label: 'Vencido', variant: 'danger' },
   ENCERRADO: { label: 'Encerrado', variant: 'neutral' },
 }

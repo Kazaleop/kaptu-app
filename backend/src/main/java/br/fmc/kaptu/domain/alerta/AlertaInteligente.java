@@ -51,6 +51,19 @@ public class AlertaInteligente extends EntidadeBase {
         this.lido = true;
     }
 
+    /**
+     * Atualiza um alerta já existente e o marca como não lido.
+     * Usado para reenviar um lembrete quando a condição persiste.
+     */
+    public void reativar(String novaMensagem) {
+        if (novaMensagem != null && !novaMensagem.isBlank()) {
+            this.mensagem = novaMensagem.trim();
+        }
+
+        this.dataGeracao = LocalDateTime.now();
+        this.lido = false;
+    }
+
     public TipoAlerta getTipoAlerta() {
         return tipoAlerta;
     }

@@ -1,5 +1,5 @@
 import type { BadgeVariant } from '@/components/ui'
-import type { ContratoLinhaDTO, ImovelDTO } from '@/types'
+import type { ContratoLinhaDTO, ImovelDTO, StatusContrato } from '@/types'
 import { diasAte } from '@/utils/format'
 
 /** Uma linha da tabela "Imóveis e contratos": o imóvel + o contrato atual dele (se houver). */
@@ -12,21 +12,23 @@ export interface LinhaImovel {
 export const DIAS_ALERTA_VENCIMENTO = 30
 
 /**
- * Junta imóveis e contratos.
+ * Junta imóveis e contratos pelo imovelId devolvido pelo backend.
  *
- * ⚠ O ContratoLinhaDTO do backend traz o NOME do imóvel, não o id,
- * então a ligação é feita pelo nome. Se o backend passar a enviar
- * "imovelId" no DTO, troque a comparação abaixo por id.
- *
- * Contrato "atual" = VIGENTE (ou VENCIDO, que ainda precisa de atenção).
- * Contratos ENCERRADOS não aparecem: o imóvel volta a ficar disponível.
+ * Contrato "atual" = VIGENTE ou EM_RENOVACAO (ou VENCIDO, que ainda precisa
+ * de atenção). Contratos ENCERRADOS não aparecem: o imóvel volta a ficar
+ * disponível.
  */
 export function montarLinhas(imoveis: ImovelDTO[], contratos: ContratoLinhaDTO[]): LinhaImovel[] {
-  const prioridade = { VIGENTE: 0, VENCIDO: 1, ENCERRADO: 2 } as const
+  const prioridade: Record<StatusContrato, number> = {
+    VIGENTE: 0,
+    EM_RENOVACAO: 1,
+    VENCIDO: 2,
+    ENCERRADO: 3,
+  }
 
   return imoveis.map((imovel) => {
     const contrato = contratos
-      .filter((c) => c.imovel === imovel.nome && c.status !== 'ENCERRADO')
+      .filter((c) => c.imovelId === imovel.id && c.status !== 'ENCERRADO')
       .sort((a, b) => prioridade[a.status] - prioridade[b.status] || b.id - a.id)[0]
     return { imovel, contrato }
   })
@@ -46,14 +48,13 @@ export function filtrarLinhas(linhas: LinhaImovel[], busca: string): LinhaImovel
 export function statusDaLinha({ contrato }: LinhaImovel): { label: string; variant: BadgeVariant } {
   if (!contrato) return { label: 'Disponível', variant: 'success' }
   if (contrato.status === 'VENCIDO') return { label: 'Vencido', variant: 'danger' }
+  if (contrato.status === 'EM_RENOVACAO') return { label: 'Em renovação', variant: 'warning' }
 
-  if (contrato.dataValidade) {
-    const dias = diasAte(contrato.dataValidade)
-    if (dias >= 0 && dias <= DIAS_ALERTA_VENCIMENTO) {
-      return {
-        label: dias === 0 ? 'Vence hoje' : `Vence em ${dias} ${dias === 1 ? 'dia' : 'dias'}`,
-        variant: 'warning',
-      }
+  const dias = diasAte(contrato.dataValidade)
+  if (dias >= 0 && dias <= DIAS_ALERTA_VENCIMENTO) {
+    return {
+      label: dias === 0 ? 'Vence hoje' : `Vence em ${dias} ${dias === 1 ? 'dia' : 'dias'}`,
+      variant: 'warning',
     }
   }
   return { label: 'Contrato ativo', variant: 'primary' }

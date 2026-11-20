@@ -4,39 +4,48 @@ package br.fmc.kaptu.service;
 import br.fmc.kaptu.domain.documento.Documento;
 import br.fmc.kaptu.domain.documento.StatusClassificacao;
 import br.fmc.kaptu.domain.documento.TipoDocumento;
+import br.fmc.kaptu.domain.excecao.RecursoNaoEncontradoExcecao;
 import br.fmc.kaptu.domain.excecao.RegraDeNegocioExcecao;
+import br.fmc.kaptu.domain.imovel.Imovel;
 import br.fmc.kaptu.ocr.ClassificadorDeDocumento;
 import br.fmc.kaptu.ocr.DocumentoFactory;
 import br.fmc.kaptu.ocr.ExtratorDeCampos;
 import br.fmc.kaptu.ocr.PdfBoxExtrator;
 import br.fmc.kaptu.ocr.TesseractExtrator;
 import br.fmc.kaptu.repository.DocumentoRepository;
-import jakarta.transaction.Transactional;
+import br.fmc.kaptu.repository.DocumentoSpecifications;
+import br.fmc.kaptu.repository.ImovelRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.transaction.Transactional;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import br.fmc.kaptu.domain.documento.TipoDocumento;
-import br.fmc.kaptu.repository.DocumentoSpecifications;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 @Service
 public class DocumentoService {
 
+    private static final Logger log =
+            LoggerFactory.getLogger(DocumentoService.class);
+
     private final SupabaseStorageService supabaseStorageService;
     private final DocumentoRepository documentoRepository;
+    private final ImovelRepository imovelRepository;
     private final DocumentoFactory documentoFactory;
     private final ClassificadorDeDocumento classificador;
     private final ExtratorDeCampos extratorDeCampos;
@@ -46,6 +55,7 @@ public class DocumentoService {
 
     public DocumentoService(
             DocumentoRepository documentoRepository,
+            ImovelRepository imovelRepository,
             DocumentoFactory documentoFactory,
             ClassificadorDeDocumento classificador,
             ExtratorDeCampos extratorDeCampos,
@@ -57,6 +67,7 @@ public class DocumentoService {
 
         this.supabaseStorageService = supabaseStorageService;
         this.documentoRepository = documentoRepository;
+        this.imovelRepository = imovelRepository;
         this.documentoFactory = documentoFactory;
         this.classificador = classificador;
         this.extratorDeCampos = extratorDeCampos;
@@ -70,9 +81,12 @@ public class DocumentoService {
     @Transactional
     public Documento processarUploadComOCR(
             MultipartFile arquivo,
-            TipoDocumento tipoInformado) {
+            TipoDocumento tipoInformado,
+            Long imovelId) {
 
         validarArquivo(arquivo);
+
+        Imovel imovel = resolverImovel(imovelId);
 
         Path destino = null;
         String caminhoEnviado = null;
@@ -102,6 +116,7 @@ public class DocumentoService {
 
             documento.definirTitulo(nomeOriginal);
             documento.definirTextoExtraido(texto);
+            documento.definirImovel(imovel);
 
             Map<String, String> campos =
                     extratorDeCampos.extrair(texto, tipo);
@@ -124,24 +139,31 @@ public class DocumentoService {
 
             return documentoRepository.save(documento);
 
-        } catch (IOException | RuntimeException e) {
+        } catch (RegraDeNegocioExcecao
+                | RecursoNaoEncontradoExcecao e) {
 
-            if (caminhoEnviado != null) {
-                try {
-                    supabaseStorageService.excluirArquivo(caminhoEnviado);
-                } catch (Exception erroExclusao) {
-                    e.addSuppressed(erroExclusao);
-                }
-            }
+            limparUpload(caminhoEnviado, e);
+            throw e;
 
-            if (e instanceof RegraDeNegocioExcecao regra) {
-                throw regra;
-            }
+        } catch (IOException e) {
 
-            throw new RegraDeNegocioExcecao(
-                    "Não foi possível processar o documento: "
-                            + e.getMessage()
+            limparUpload(caminhoEnviado, e);
+
+            throw new IllegalStateException(
+                    "Falha ao gravar o arquivo enviado.", e
             );
+
+        } catch (RuntimeException e) {
+
+            limparUpload(caminhoEnviado, e);
+
+            log.error(
+                    "Erro inesperado ao processar documento {}",
+                    arquivo.getOriginalFilename(),
+                    e
+            );
+
+            throw e;
 
         } finally {
 
@@ -149,12 +171,39 @@ public class DocumentoService {
                 try {
                     Files.deleteIfExists(destino);
                 } catch (IOException erroExclusao) {
-                    System.err.println(
-                            "Não foi possível excluir arquivo temporário: "
-                                    + erroExclusao.getMessage()
+                    log.warn(
+                            "Não foi possível excluir arquivo temporário: {}",
+                            erroExclusao.getMessage()
                     );
                 }
             }
+        }
+    }
+
+    private Imovel resolverImovel(Long imovelId) {
+
+        if (imovelId == null) {
+            return null;
+        }
+
+        return imovelRepository.findById(imovelId)
+                .orElseThrow(() -> new RecursoNaoEncontradoExcecao(
+                        "Imóvel não encontrado."
+                ));
+    }
+
+    private void limparUpload(
+            String caminhoEnviado,
+            Exception causa) {
+
+        if (caminhoEnviado == null) {
+            return;
+        }
+
+        try {
+            supabaseStorageService.excluirArquivo(caminhoEnviado);
+        } catch (Exception erroExclusao) {
+            causa.addSuppressed(erroExclusao);
         }
     }
 
@@ -235,19 +284,7 @@ public class DocumentoService {
             BigDecimal valorMinimo,
             BigDecimal valorMaximo) {
 
-        if (dataInicio != null && dataFim != null
-                && dataInicio.isAfter(dataFim)) {
-            throw new RegraDeNegocioExcecao(
-                    "A data inicial não pode ser posterior à data final."
-            );
-        }
-
-        if (valorMinimo != null && valorMaximo != null
-                && valorMinimo.compareTo(valorMaximo) > 0) {
-            throw new RegraDeNegocioExcecao(
-                    "O valor mínimo não pode ser maior que o máximo."
-            );
-        }
+        validarFiltros(dataInicio, dataFim, valorMinimo, valorMaximo);
 
         return documentoRepository.findAll(
                 DocumentoSpecifications.dataEmissaoEntre(
@@ -263,6 +300,7 @@ public class DocumentoService {
                 )
         );
     }
+
     public Page<Documento> listarPaginadoComFiltros(
             LocalDate dataInicio,
             LocalDate dataFim,

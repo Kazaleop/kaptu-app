@@ -94,6 +94,24 @@ public class Contrato extends EntidadeBase implements Vencivel {
         this.imovel.liberar();
     }
 
+    /**
+     * Marca o contrato como vencido quando a data de validade já passou
+     * e libera o imóvel, caso ele ainda esteja ocupado.
+     */
+    public void marcarVencido() {
+        if (statusContrato == StatusContrato.VENCIDO
+                || statusContrato == StatusContrato.ENCERRADO) {
+            return;
+        }
+
+        this.statusContrato = StatusContrato.VENCIDO;
+
+        if (this.imovel.getStatusOcupacao()
+                == StatusOcupacao.OCUPADO) {
+            this.imovel.liberar();
+        }
+    }
+
     public Imovel getImovel() {
         return imovel;
     }

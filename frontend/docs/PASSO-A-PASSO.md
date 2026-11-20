@@ -419,7 +419,7 @@ Não vão para o GitHub (estão no `.gitignore`): `node_modules/`, `dist/`, `.en
 6. Todo `git push` na `main` gera um deploy novo automaticamente.
 
 ### 7.4 Quando quiser o site da Vercel usando o backend
-Pré-requisito: o backend publicado com **HTTPS** (Railway, Render ou túnel) e o domínio da Vercel liberado no CORS dele (`APP_CORS_ALLOWEDORIGINS=https://seu-projeto.vercel.app`).
+Pré-requisito: o backend publicado com **HTTPS** (Railway, Render ou túnel) e o domínio da Vercel liberado no CORS dele (`APP_CORS_ALLOWED_ORIGINS=https://seu-projeto.vercel.app`).
 1. Vercel → projeto → **Settings → Environment Variables** → adicionar:
    - `VITE_USE_MOCKS` = `false`
    - `VITE_API_URL` = `https://url-do-backend` (sem `/` no final, sem `/api/v1`)
@@ -520,7 +520,7 @@ O build da Vercel usa esse arquivo, então não é preciso cadastrar variáveis 
 
 **Obrigatório no backend (Railway → serviço → Variables):** liberar o domínio da Vercel no CORS. Sem isso, o navegador bloqueia todas as chamadas do site (403).
 ```
-APP_CORS_ALLOWEDORIGINS=https://kaptu-frontend-11-11.vercel.app,https://kaptu-frontend-11-11-*.vercel.app,http://localhost:5173
+APP_CORS_ALLOWED_ORIGINS=https://kaptu-frontend-11-11.vercel.app,https://kaptu-frontend-11-11-*.vercel.app,http://localhost:5173
 ```
 O `localhost:5173` continua na lista para o desenvolvimento local funcionar.
 

@@ -93,7 +93,7 @@ public class ExtratorDeCampos {
 
         adicionar(campos, "prazoMeses", prazo);
 
-        String data = primeiraData(texto);
+        String data = ultimaData(texto);
         adicionar(campos, "dataValidade", converterData(data));
 
         adicionarValor(campos, "valorAluguel", texto);
@@ -131,7 +131,7 @@ public class ExtratorDeCampos {
             String normalizado,
             Map<String, String> campos) {
 
-        String data = primeiraData(texto);
+        String data = ultimaData(texto);
         adicionar(campos, "dataValidade", converterData(data));
 
         if (normalizado.contains("municipal")) {
@@ -179,10 +179,21 @@ public class ExtratorDeCampos {
         }
     }
 
-    private String primeiraData(String texto) {
+    /**
+     * Retorna a última data do texto. Em contratos e certidões a data de
+     * validade é a data final, então usar a primeira data lia a data de
+     * emissão/início por engano.
+     */
+    private String ultimaData(String texto) {
         Matcher matcher = DATA.matcher(texto);
 
-        return matcher.find() ? matcher.group(1) : null;
+        String ultima = null;
+
+        while (matcher.find()) {
+            ultima = matcher.group(1);
+        }
+
+        return ultima;
     }
 
     private String converterData(String data) {

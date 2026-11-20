@@ -16,7 +16,8 @@ public record DocumentoDTO(
         LocalDate dataEmissao,
         BigDecimal valorReferencia,
         String resumo,
-        String textoExtraido
+        String textoExtraido,
+        Long imovelId
 ) {
 
     public static DocumentoDTO de(Documento documento) {
@@ -28,7 +29,10 @@ public record DocumentoDTO(
                 documento.getDataEmissao(),
                 documento.getValorReferencia(),
                 documento.getResumo(),
-                documento.getTextoExtraido()
+                documento.getTextoExtraido(),
+                documento.getImovel() != null
+                        ? documento.getImovel().getId()
+                        : null
         );
     }
 }
