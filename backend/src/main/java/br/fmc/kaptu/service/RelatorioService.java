@@ -157,11 +157,6 @@ public class RelatorioService {
         }
     }
 
-    // Método alternativo para compatibilidade com chamadas anteriores.
-    public byte[] gerarRelatorio(LocalDate inicio, LocalDate fim) {
-        return gerarRelatorioMpse(inicio, fim);
-    }
-
     private BigDecimal somar(
             List<TransacaoFinanceira> transacoes,
             TipoTransacao tipo
