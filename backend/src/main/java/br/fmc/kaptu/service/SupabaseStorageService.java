@@ -62,6 +62,7 @@ public class SupabaseStorageService {
         HttpRequest requisicao = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("apikey", secretKey)
+                .header("Authorization", "Bearer " + secretKey)
                 .header("Content-Type", tipoConteudo)
                 .header("x-upsert", "false")
                 .POST(HttpRequest.BodyPublishers.ofFile(arquivo))
@@ -102,6 +103,7 @@ public class SupabaseStorageService {
         HttpRequest requisicao = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("apikey", secretKey)
+                .header("Authorization", "Bearer " + secretKey)
                 .DELETE()
                 .build();
 
@@ -126,6 +128,59 @@ public class SupabaseStorageService {
                     "Exclusão no Supabase foi interrompida.", e
             );
         }
+    }
+
+    public ArquivoBaixado baixarArquivo(String caminhoNoBucket)
+            throws IOException {
+
+        if (supabaseUrl == null || supabaseUrl.isBlank()
+                || secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException(
+                    "Configure SUPABASE_URL e SUPABASE_SECRET_KEY."
+            );
+        }
+
+        String url = supabaseUrl.replaceAll("/+$", "")
+                + "/storage/v1/object/"
+                + codificar(bucket)
+                + "/"
+                + codificarCaminho(caminhoNoBucket);
+
+        HttpRequest requisicao = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("apikey", secretKey)
+                .header("Authorization", "Bearer " + secretKey)
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<byte[]> resposta = httpClient.send(
+                    requisicao,
+                    HttpResponse.BodyHandlers.ofByteArray()
+            );
+
+            if (resposta.statusCode() != 200) {
+                throw new IOException(
+                        "Falha ao baixar arquivo do Supabase. HTTP "
+                                + resposta.statusCode()
+                );
+            }
+
+            String tipo = resposta.headers()
+                    .firstValue("Content-Type")
+                    .orElse("application/octet-stream");
+
+            return new ArquivoBaixado(resposta.body(), tipo);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(
+                    "Download do Supabase foi interrompido.", e
+            );
+        }
+    }
+
+    public record ArquivoBaixado(byte[] conteudo, String tipoConteudo) {
     }
 
     private String codificar(String valor) {

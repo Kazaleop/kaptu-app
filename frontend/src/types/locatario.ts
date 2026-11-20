@@ -5,6 +5,8 @@ export interface LocatarioDTO {
   cpfCnpj: string
   telefone: string
   email: string
+  /** LocalDateTime ISO devolvido pelo backend */
+  dataCadastro: string
 }
 
 /** web/dto/LocatarioRequest.java (corpo do POST /locatarios) */

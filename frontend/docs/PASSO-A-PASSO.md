@@ -419,7 +419,7 @@ Não vão para o GitHub (estão no `.gitignore`): `node_modules/`, `dist/`, `.en
 6. Todo `git push` na `main` gera um deploy novo automaticamente.
 
 ### 7.4 Quando quiser o site da Vercel usando o backend
-Pré-requisito: o backend publicado com **HTTPS** (Railway, Render ou túnel) e o domínio da Vercel liberado no CORS dele (`APP_CORS_ALLOWEDORIGINS=https://seu-projeto.vercel.app`).
+Pré-requisito: o backend publicado com **HTTPS** (Railway, Render ou túnel) e o domínio da Vercel liberado no CORS dele (`APP_CORS_ALLOWED_ORIGINS=https://seu-projeto.vercel.app`).
 1. Vercel → projeto → **Settings → Environment Variables** → adicionar:
    - `VITE_USE_MOCKS` = `false`
    - `VITE_API_URL` = `https://url-do-backend` (sem `/` no final, sem `/api/v1`)
@@ -505,12 +505,13 @@ Alguns dados não têm endpoint próprio e são **calculados no front**:
 | | URL |
 |---|---|
 | Frontend (Vercel) | https://kaptu-frontend-11-11.vercel.app |
-| Backend (Railway) | https://kaptu-production-905b28d7.up.railway.app |
+| Frontend (Railway) | https://frontend-production-2c99b21f.up.railway.app |
+| Backend (Railway) | https://backend-production-23c83fa9.up.railway.app |
 
 **No front:** o `.env.production` passou a ser:
 ```
 VITE_USE_MOCKS=false
-VITE_API_URL=https://kaptu-production-905b28d7.up.railway.app
+VITE_API_URL=https://backend-production-23c83fa9.up.railway.app
 ```
 O build da Vercel usa esse arquivo, então não é preciso cadastrar variáveis no painel. Se elas forem cadastradas lá, têm prioridade.
 
@@ -520,7 +521,7 @@ O build da Vercel usa esse arquivo, então não é preciso cadastrar variáveis 
 
 **Obrigatório no backend (Railway → serviço → Variables):** liberar o domínio da Vercel no CORS. Sem isso, o navegador bloqueia todas as chamadas do site (403).
 ```
-APP_CORS_ALLOWEDORIGINS=https://kaptu-frontend-11-11.vercel.app,https://kaptu-frontend-11-11-*.vercel.app,http://localhost:5173
+APP_CORS_ALLOWED_ORIGINS=https://kaptu-frontend-11-11.vercel.app,https://kaptu-frontend-11-11-*.vercel.app,http://localhost:5173
 ```
 O `localhost:5173` continua na lista para o desenvolvimento local funcionar.
 

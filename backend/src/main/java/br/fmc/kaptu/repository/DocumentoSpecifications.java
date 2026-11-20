@@ -97,6 +97,29 @@ public final class DocumentoSpecifications {
         };
     }
 
+    public static Specification<Documento> porBusca(
+            String busca) {
+
+        return (root, query, criteriaBuilder) -> {
+            if (busca == null || busca.isBlank()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            String termo = "%" + busca.trim().toLowerCase() + "%";
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("titulo")),
+                            termo
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("textoExtraido")),
+                            termo
+                    )
+            );
+        };
+    }
+
     private static Class<? extends Documento> classeDoTipo(
             TipoDocumento tipo) {
 

@@ -29,8 +29,15 @@ public class Certidao extends Documento implements Vencivel {
 
     @Override
     public String getResumo() {
-        return "Certidão " + tipoCertidao
-                + " - Válida até " + dataValidade;
+        String tipo = tipoCertidao != null
+                ? tipoCertidao.toString()
+                : "não identificada";
+
+        String validade = dataValidade != null
+                ? dataValidade.toString()
+                : "não identificada";
+
+        return "Certidão " + tipo + " - Válida até " + validade;
     }
 
     @Override
@@ -74,8 +81,11 @@ public class Certidao extends Documento implements Vencivel {
 
     @Override
     public String getDescricaoAlerta() {
-        return "Certidão " + tipoCertidao
-                + " vence em " + dataValidade;
+        String tipo = tipoCertidao != null
+                ? tipoCertidao.toString()
+                : "não identificada";
+
+        return "Certidão " + tipo + " vence em " + dataValidade;
     }
 
     public String getOrgaoEmissor() {

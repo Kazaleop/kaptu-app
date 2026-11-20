@@ -4,6 +4,8 @@ package br.fmc.kaptu.service;
 import br.fmc.kaptu.domain.excecao.RegraDeNegocioExcecao;
 import br.fmc.kaptu.domain.excecao.RecursoNaoEncontradoExcecao;
 import br.fmc.kaptu.domain.imovel.Imovel;
+import br.fmc.kaptu.repository.ContratoRepository;
+import br.fmc.kaptu.repository.DocumentoRepository;
 import br.fmc.kaptu.repository.ImovelRepository;
 
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,12 @@ class ImovelServiceTest {
 
     @Mock
     private ImovelRepository repository;
+
+    @Mock
+    private ContratoRepository contratoRepository;
+
+    @Mock
+    private DocumentoRepository documentoRepository;
 
     @InjectMocks
     private ImovelService service;

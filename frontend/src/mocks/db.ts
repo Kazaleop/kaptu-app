@@ -18,16 +18,16 @@ export const mockDb: {
     { id: 5, nome: 'Apartamento 302', endereco: 'Av. Beira Mar, 900', bairro: 'Coroa do Meio', quantResidentes: 3, valorAluguelMensal: 2300, statusOcupacao: 'DISPONIVEL' },
   ],
   locatarios: [
-    { id: 1, nome: 'Marcos Carvalho', cpfCnpj: '11122233344', telefone: '79999990011', email: 'marcos@exemplo.com' },
-    { id: 2, nome: 'Ana Ribeiro', cpfCnpj: '22233344455', telefone: '79999990022', email: 'ana@exemplo.com' },
-    { id: 3, nome: 'João Santos', cpfCnpj: '33344455566', telefone: '79999990033', email: 'joao@exemplo.com' },
-    { id: 4, nome: 'Paula Lima', cpfCnpj: '44455566677', telefone: '79999990044', email: 'paula@exemplo.com' },
+    { id: 1, nome: 'Marcos Carvalho', cpfCnpj: '11122233344', telefone: '79999990011', email: 'marcos@exemplo.com', dataCadastro: diasAPartirDeHoje(-420) },
+    { id: 2, nome: 'Ana Ribeiro', cpfCnpj: '22233344455', telefone: '79999990022', email: 'ana@exemplo.com', dataCadastro: diasAPartirDeHoje(-380) },
+    { id: 3, nome: 'João Santos', cpfCnpj: '33344455566', telefone: '79999990033', email: 'joao@exemplo.com', dataCadastro: diasAPartirDeHoje(-300) },
+    { id: 4, nome: 'Paula Lima', cpfCnpj: '44455566677', telefone: '79999990044', email: 'paula@exemplo.com', dataCadastro: diasAPartirDeHoje(-250) },
   ],
   contratos: [
-    { id: 1, imovel: 'Edifício Sede — Sala 204', locatario: 'Marcos Carvalho', status: 'VIGENTE', valor: 4800 },
-    { id: 2, imovel: 'Casa Institucional 037', locatario: 'Ana Ribeiro', status: 'VIGENTE', valor: 3250, dataValidade: diasAPartirDeHoje(5) },
-    { id: 3, imovel: 'Loja Comercial 015', locatario: 'João Santos', status: 'VIGENTE', valor: 2900 },
-    { id: 4, imovel: 'Galpão 078', locatario: 'Paula Lima', status: 'VIGENTE', valor: 6400 },
+    { id: 1, imovelId: 1, locatarioId: 1, imovel: 'Edifício Sede — Sala 204', locatario: 'Marcos Carvalho', status: 'VIGENTE', valor: 4800, dataExpedicao: diasAPartirDeHoje(-305), prazoMeses: 365, dataValidade: diasAPartirDeHoje(305) },
+    { id: 2, imovelId: 2, locatarioId: 2, imovel: 'Casa Institucional 037', locatario: 'Ana Ribeiro', status: 'VIGENTE', valor: 3250, dataExpedicao: diasAPartirDeHoje(-5), prazoMeses: 12, dataValidade: diasAPartirDeHoje(5) },
+    { id: 3, imovelId: 3, locatarioId: 3, imovel: 'Loja Comercial 015', locatario: 'João Santos', status: 'EM_RENOVACAO', valor: 2900, dataExpedicao: diasAPartirDeHoje(-22), prazoMeses: 12, dataValidade: diasAPartirDeHoje(22) },
+    { id: 4, imovelId: 4, locatarioId: 4, imovel: 'Galpão 078', locatario: 'Paula Lima', status: 'VIGENTE', valor: 6400, dataExpedicao: diasAPartirDeHoje(-190), prazoMeses: 12, dataValidade: diasAPartirDeHoje(190) },
   ],
 }
 

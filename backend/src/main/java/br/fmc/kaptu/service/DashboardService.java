@@ -2,8 +2,11 @@
 package br.fmc.kaptu.service;
 
 import br.fmc.kaptu.domain.imovel.StatusContrato;
+import br.fmc.kaptu.domain.documento.StatusClassificacao;
 import br.fmc.kaptu.domain.imovel.StatusOcupacao;
 import br.fmc.kaptu.domain.financeiro.TipoTransacao;
+
+import br.fmc.kaptu.repository.DocumentoRepository;
 
 import br.fmc.kaptu.repository.ImovelRepository;
 import br.fmc.kaptu.repository.ContratoRepository;
@@ -25,17 +28,20 @@ public class DashboardService {
     private final ContratoRepository contratoRepository;
     private final AlertaRepository alertaRepository;
     private final TransacaoRepository transacaoRepository;
+    private final DocumentoRepository documentoRepository;
 
     public DashboardService(
             ImovelRepository imovelRepository,
             ContratoRepository contratoRepository,
             AlertaRepository alertaRepository,
-            TransacaoRepository transacaoRepository
+            TransacaoRepository transacaoRepository,
+            DocumentoRepository documentoRepository
     ) {
         this.imovelRepository = imovelRepository;
         this.contratoRepository = contratoRepository;
         this.alertaRepository = alertaRepository;
         this.transacaoRepository = transacaoRepository;
+        this.documentoRepository = documentoRepository;
     }
 
     @Transactional(readOnly = true)
@@ -77,6 +83,21 @@ public class DashboardService {
 
         BigDecimal saldo = entradas.subtract(saidas);
 
+        long contratosAVencer30Dias = contratoRepository.findAll().stream()
+                .filter(c -> c.getStatusContrato() == StatusContrato.VIGENTE)
+                .filter(c -> !c.getDataValidade().isAfter(hoje.plusDays(30)))
+                .count();
+
+        long documentosTotal = documentoRepository.count();
+
+        long documentosClassificados = documentoRepository.findAll().stream()
+                .filter(d -> d.getStatusClassificacao()
+                        == StatusClassificacao.CLASSIFICADO)
+                .count();
+
+        long documentosAguardandoRevisao = documentosTotal
+                - documentosClassificados;
+
         return new DashboardDTO(
                 totalImoveis,
                 imoveisOcupados,
@@ -84,7 +105,11 @@ public class DashboardService {
                 alertasNaoLidos,
                 entradas,
                 saidas,
-                saldo
+                saldo,
+                contratosAVencer30Dias,
+                documentosTotal,
+                documentosClassificados,
+                documentosAguardandoRevisao
         );
     }
 }

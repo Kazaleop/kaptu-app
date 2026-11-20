@@ -25,8 +25,8 @@ public abstract class Usuario extends EntidadeBase {
     }
 
     protected Usuario(String nome, String email, String senhaHash) {
-        this.nome = nome;
-        this.email = email;
+        this.nome = nome == null ? null : nome.trim();
+        this.email = email == null ? null : email.trim().toLowerCase();
         this.senhaHash = senhaHash;
     }
 
@@ -62,5 +62,9 @@ public abstract class Usuario extends EntidadeBase {
 
     public boolean isAtivo() {
         return ativo;
+    }
+
+    public String getSenhaHash() {
+        return senhaHash;
     }
 }

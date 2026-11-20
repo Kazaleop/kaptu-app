@@ -1,10 +1,12 @@
 /**
  * Espelho de domain/documento/* e web/dto/DocumentoDTO.java
  *
+ * GET  /api/v1/documentos?dataInicio=&dataFim=&tipo=&imovelId=&valorMinimo=&valorMaximo=&page=&size=
+ *      -> Page<DocumentoDTO> (paginado pelo Spring)
  * GET  /api/v1/documentos/filtros?dataInicio=&dataFim=&tipo=&imovelId=&valorMinimo=&valorMaximo=
- *      -> DocumentoDTO[] (lista completa, sem paginação nem busca por texto)
+ *      -> DocumentoDTO[] (lista completa)
  * GET  /api/v1/documentos/{id} -> DocumentoDTO
- * POST /api/v1/documentos/upload (multipart: arquivo, tipo?) -> DocumentoDTO
+ * POST /api/v1/documentos/upload (multipart: arquivo, tipo?, imovelId?) -> DocumentoDTO
  *      OCR síncrono: a resposta já vem classificada (ou com erro).
  */
 
@@ -40,9 +42,15 @@ export interface DocumentoDTO {
   resumo: string | null
   /** Texto completo lido pelo OCR */
   textoExtraido: string | null
+  /** Imóvel vinculado no upload (null quando não informado) */
+  imovelId: number | null
+  imovelNome: string | null
+  dataValidade: string | null
+  criadoEm: string
+  possuiArquivo: boolean
 }
 
-/** Filtros enviados ao backend (query string de /documentos/filtros). */
+/** Filtros enviados ao backend (query string de /documentos e /documentos/filtros). */
 export interface FiltrosDocumentosApi {
   tipo?: TipoDocumento
   imovelId?: number
@@ -50,6 +58,9 @@ export interface FiltrosDocumentosApi {
   dataInicio?: string
   /** "AAAA-MM-DD" */
   dataFim?: string
+  /** BigDecimal no Java -> number no JSON */
+  valorMinimo?: number
+  valorMaximo?: number
 }
 
 /** Filtros da tela: os do backend + busca por texto e paginação (feitas no front). */
@@ -73,10 +84,7 @@ export interface ImportarDocumentoRequest {
   arquivo: File
   /** Vazio = o backend detecta pelo conteúdo */
   tipo?: TipoDocumento
-  /**
-   * ⚠ PROPOSTO: o backend ainda não recebe o imóvel no upload.
-   * É enviado mesmo assim (o Spring ignora) para funcionar quando ele for criado.
-   */
+  /** Imóvel ao qual o documento será vinculado (opcional) */
   imovelId?: number
 }
 

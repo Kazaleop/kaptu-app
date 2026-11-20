@@ -1,0 +1,25 @@
+{
+  "info": {
+    "name": "Kaptu API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080" }
+  ],
+  "item": [
+    { "name": "Health", "request": { "method": "GET", "url": "{{base_url}}/health" } },
+    { "name": "Listar imoveis", "request": { "method": "GET", "url": "{{base_url}}/api/v1/imoveis" } },
+    { "name": "Cadastrar imovel", "request": { "method": "POST", "url": "{{base_url}}/api/v1/imoveis", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Apartamento 101\",\n  \"endereco\": \"Rua A, 100\",\n  \"bairro\": \"Centro\",\n  \"quantResidentes\": 4,\n  \"valorAluguelMensal\": 1500.00\n}" } } },
+    { "name": "Listar locatarios", "request": { "method": "GET", "url": "{{base_url}}/api/v1/locatarios" } },
+    { "name": "Cadastrar locatario", "request": { "method": "POST", "url": "{{base_url}}/api/v1/locatarios", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nome\": \"João Silva\",\n  \"cpfCnpj\": \"52998224725\",\n  \"telefone\": \"11987654321\",\n  \"email\": \"joao@gmail.com\"\n}" } } },
+    { "name": "Listar contratos", "request": { "method": "GET", "url": "{{base_url}}/api/v1/contratos" } },
+    { "name": "Listar documentos", "request": { "method": "GET", "url": "{{base_url}}/api/v1/documentos" } },
+    { "name": "Upload documento", "request": { "method": "POST", "url": "{{base_url}}/api/v1/documentos/upload", "body": { "mode": "formdata", "formdata": [ { "key": "arquivo", "type": "file", "src": "" }, { "key": "tipo", "value": "NOTA_FISCAL", "type": "text" } ] } } },
+    { "name": "Listar transacoes", "request": { "method": "GET", "url": "{{base_url}}/api/v1/financeiro/transacoes" } },
+    { "name": "Lancar transacao", "request": { "method": "POST", "url": "{{base_url}}/api/v1/financeiro/transacoes", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"descricao\": \"Manutenção predial\",\n  \"valor\": 100.00,\n  \"dataTransacao\": \"2026-11-20\",\n  \"tipoTransacao\": \"SAIDA\"\n}" } } },
+    { "name": "Resumo financeiro", "request": { "method": "GET", "url": "{{base_url}}/api/v1/financeiro/resumo" } },
+    { "name": "Fluxo mensal", "request": { "method": "GET", "url": "{{base_url}}/api/v1/financeiro/fluxo-mensal?meses=6" } },
+    { "name": "Dashboard", "request": { "method": "GET", "url": "{{base_url}}/api/v1/dashboard/resumo" } },
+    { "name": "Listar alertas", "request": { "method": "GET", "url": "{{base_url}}/api/v1/alertas" } }
+  ]
+}

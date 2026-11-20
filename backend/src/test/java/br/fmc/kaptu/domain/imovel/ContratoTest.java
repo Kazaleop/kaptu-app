@@ -37,7 +37,8 @@ class ContratoTest {
                 LocalDate.of(2026, 11, 9),
                 12,
                 LocalDate.of(2027, 11, 9),
-                new BigDecimal("1500.00")
+                new BigDecimal("1500.00"),
+                null
         );
     }
 
@@ -99,8 +100,9 @@ class ContratoTest {
                         LocalDate.of(2026, 11, 9),
                         0,
                         LocalDate.of(2027, 11, 9),
-                        new BigDecimal("1500.00")
-                )
+                        new BigDecimal("1500.00"),
+                        null
+        )
         );
     }
 
@@ -114,8 +116,10 @@ class ContratoTest {
                         LocalDate.of(2026, 11, 9),
                         12,
                         LocalDate.of(2027, 11, 9),
-                        BigDecimal.ZERO
+                        BigDecimal.ZERO,
+                        null
                 )
         );
     }
 }
+

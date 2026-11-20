@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public record TransacaoCriacaoDTO(
 
         @NotBlank(message = "A descrição é obrigatória.")
+        @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres.")
         String descricao,
 
         @NotNull(message = "O valor é obrigatório.")

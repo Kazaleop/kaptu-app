@@ -2,6 +2,7 @@
 package br.fmc.kaptu.domain.alerta;
 
 import br.fmc.kaptu.domain.base.EntidadeBase;
+import br.fmc.kaptu.domain.excecao.RegraDeNegocioExcecao;
 
 import jakarta.persistence.*;
 
@@ -36,7 +37,7 @@ public class AlertaInteligente extends EntidadeBase {
     ) {
         if (tipoAlerta == null || mensagem == null
                 || mensagem.isBlank() || referenciaId == null) {
-            throw new IllegalArgumentException(
+            throw new RegraDeNegocioExcecao(
                     "Os dados do alerta são obrigatórios."
             );
         }
@@ -49,6 +50,19 @@ public class AlertaInteligente extends EntidadeBase {
 
     public void marcarComoLido() {
         this.lido = true;
+    }
+
+    /**
+     * Atualiza um alerta já existente e o marca como não lido.
+     * Usado para reenviar um lembrete quando a condição persiste.
+     */
+    public void reativar(String novaMensagem) {
+        if (novaMensagem != null && !novaMensagem.isBlank()) {
+            this.mensagem = novaMensagem.trim();
+        }
+
+        this.dataGeracao = LocalDateTime.now();
+        this.lido = false;
     }
 
     public TipoAlerta getTipoAlerta() {

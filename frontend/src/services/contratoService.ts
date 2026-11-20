@@ -2,7 +2,8 @@ import { usarMock } from '@/config/endpoints'
 import { env } from '@/config/env'
 import { mockContratosAVencer } from '@/mocks/dashboard'
 import { delay, mockDb, nextId } from '@/mocks/db'
-import type { AlertaDTO, ContratoLinhaDTO, ContratoRequest } from '@/types'
+import type { ContratoLinhaDTO, ContratoRequest } from '@/types'
+import { somarMeses, toIsoDate } from '@/utils/format'
 import { api, ApiError } from './api'
 
 /** Endpoints de ImobiliarioController relativos a contratos. */
@@ -24,12 +25,20 @@ export const contratoService = {
       const locatario = mockDb.locatarios.find((l) => l.id === request.locatarioId)
       if (!imovel || !locatario) throw new ApiError('Imóvel ou locatário não encontrado.', 404)
       imovel.statusOcupacao = 'OCUPADO'
+      const dataExpedicao = request.dataExpedicao ?? toIsoDate(new Date())
+      const dataValidade = somarMeses(dataExpedicao, request.prazoMeses)
       const novo: ContratoLinhaDTO = {
         id: nextId(mockDb.contratos),
+        imovelId: imovel.id,
+        locatarioId: locatario.id,
         imovel: imovel.nome,
         locatario: locatario.nome,
         status: 'VIGENTE',
         valor: request.valorAluguel,
+        dataExpedicao,
+        prazoMeses: request.prazoMeses,
+        dataValidade,
+        indiceReajuste: request.indiceReajuste,
       }
       mockDb.contratos.push(novo)
       return delay(novo)
@@ -46,17 +55,10 @@ export const contratoService = {
    */
   async contarAVencer(): Promise<number> {
     if (usarMock('contratosAVencer')) return delay(mockContratosAVencer)
-    const [{ data: alertas }, { data: contratos }] = await Promise.all([
-      api.get<AlertaDTO[]>('/alertas'),
-      api.get<ContratoLinhaDTO[]>('/contratos'),
-    ])
-    const vigentes = new Set(contratos.filter((c) => c.status === 'VIGENTE').map((c) => c.id))
-    const aVencer = new Set(
-      alertas
-        .filter((a) => a.tipo === 'CONTRATO_A_VENCER' && vigentes.has(a.referenciaId))
-        .map((a) => a.referenciaId),
-    )
-    return aVencer.size
+    const { data: contratos } = await api.get<ContratoLinhaDTO[]>('/contratos', {
+      params: { status: 'VIGENTE', venceEmDias: 30 },
+    })
+    return contratos.length
   },
 
   /** POST /api/v1/contratos/{id}/encerrar -> 204 sem corpo */

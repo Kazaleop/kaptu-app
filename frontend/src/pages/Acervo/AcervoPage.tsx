@@ -149,7 +149,7 @@ export function AcervoPage() {
           onRetry={refetch}
         >
           <div className={cn('transition-opacity', isFetching && 'opacity-60')}>
-            <DocumentosTable documentos={data?.content ?? []} />
+            <DocumentosTable documentos={data?.content ?? []} imoveis={imoveis} />
           </div>
         </QueryState>
 

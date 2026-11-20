@@ -1,20 +1,28 @@
 import { Badge, Icon, Table, Td, Th, Tr } from '@/components/ui'
-import type { DocumentoDTO } from '@/types'
+import type { DocumentoDTO, ImovelDTO } from '@/types'
 import { formatCurrency, formatDataCurta } from '@/utils/format'
 import { statusClassificacaoLabel, tipoDocumentoLabel } from '@/utils/labels'
 
 /**
- * Tabela DOCUMENTO · TIPO · DATA · VALOR · STATUS
- * (O Figma tem a coluna "Localização", mas o DocumentoDTO do backend ainda não
- * informa o imóvel; no lugar dela mostramos o valor lido pelo OCR.)
+ * Tabela DOCUMENTO · TIPO · LOCALIZAÇÃO · DATA · VALOR · STATUS
+ * A localização vem do imovelId vinculado no upload do documento.
  */
-export function DocumentosTable({ documentos }: { documentos: DocumentoDTO[] }) {
+export function DocumentosTable({
+  documentos,
+  imoveis,
+}: {
+  documentos: DocumentoDTO[]
+  imoveis: ImovelDTO[]
+}) {
+  const nomeImovel = new Map(imoveis.map((i) => [i.id, i.nome]))
+
   return (
     <Table>
       <thead>
         <tr>
           <Th>Documento</Th>
           <Th>Tipo</Th>
+          <Th>Localização</Th>
           <Th>Data</Th>
           <Th>Valor</Th>
           <Th>Status</Th>
@@ -41,6 +49,9 @@ export function DocumentosTable({ documentos }: { documentos: DocumentoDTO[] }) 
                 </span>
               </Td>
               <Td className="text-muted">{tipoDocumentoLabel[doc.tipo] ?? doc.tipo}</Td>
+              <Td className="whitespace-nowrap text-muted">
+                {doc.imovelId != null ? (nomeImovel.get(doc.imovelId) ?? '—') : '—'}
+              </Td>
               <Td className="whitespace-nowrap text-muted">
                 {doc.dataEmissao ? formatDataCurta(doc.dataEmissao) : '—'}
               </Td>

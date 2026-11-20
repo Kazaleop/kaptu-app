@@ -32,4 +32,6 @@ public interface TransacaoRepository
             LocalDate inicio,
             LocalDate fim
     );
+
+    boolean existsByDocumento_Id(Long documentoId);
 }

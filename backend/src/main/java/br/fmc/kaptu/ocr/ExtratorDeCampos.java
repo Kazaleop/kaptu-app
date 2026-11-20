@@ -1,4 +1,3 @@
-
 package br.fmc.kaptu.ocr;
 
 import br.fmc.kaptu.domain.documento.TipoDocumento;
@@ -79,6 +78,9 @@ public class ExtratorDeCampos {
         adicionar(campos, "numeroNota", numero);
 
         adicionarValor(campos, "valorTotal", texto);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void extrairContrato(
@@ -93,10 +95,13 @@ public class ExtratorDeCampos {
 
         adicionar(campos, "prazoMeses", prazo);
 
-        String data = primeiraData(texto);
+        String data = ultimaData(texto);
         adicionar(campos, "dataValidade", converterData(data));
 
         adicionarValor(campos, "valorAluguel", texto);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void extrairRecibo(
@@ -124,6 +129,9 @@ public class ExtratorDeCampos {
         adicionar(campos, "numTransacao", transacao);
 
         adicionarValor(campos, "valor", texto);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void extrairCertidao(
@@ -131,7 +139,7 @@ public class ExtratorDeCampos {
             String normalizado,
             Map<String, String> campos) {
 
-        String data = primeiraData(texto);
+        String data = ultimaData(texto);
         adicionar(campos, "dataValidade", converterData(data));
 
         if (normalizado.contains("municipal")) {
@@ -148,6 +156,9 @@ public class ExtratorDeCampos {
         );
 
         adicionar(campos, "orgaoEmissor", orgao);
+
+        adicionar(campos, "dataEmissao",
+                converterData(primeiraData(texto)));
     }
 
     private void adicionarValor(
@@ -183,6 +194,18 @@ public class ExtratorDeCampos {
         Matcher matcher = DATA.matcher(texto);
 
         return matcher.find() ? matcher.group(1) : null;
+    }
+
+    private String ultimaData(String texto) {
+        Matcher matcher = DATA.matcher(texto);
+
+        String ultima = null;
+
+        while (matcher.find()) {
+            ultima = matcher.group(1);
+        }
+
+        return ultima;
     }
 
     private String converterData(String data) {

@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface DocumentoRepository
         extends JpaRepository<Documento, Long>,
         JpaSpecificationExecutor<Documento> {
+
+    boolean existsByImovel_Id(Long imovelId);
 }

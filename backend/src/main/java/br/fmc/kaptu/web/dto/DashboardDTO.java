@@ -10,6 +10,10 @@ public record DashboardDTO(
         long alertasNaoLidos,
         BigDecimal entradasMes,
         BigDecimal saidasMes,
-        BigDecimal saldoMes
+        BigDecimal saldoMes,
+        long contratosAVencer30Dias,
+        long documentosTotal,
+        long documentosClassificados,
+        long documentosAguardandoRevisao
 ) {
 }

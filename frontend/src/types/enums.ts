@@ -15,6 +15,7 @@ export type StatusOcupacao = (typeof StatusOcupacao)[keyof typeof StatusOcupacao
 // domain/imovel/StatusContrato.java
 export const StatusContrato = {
   VIGENTE: 'VIGENTE',
+  EM_RENOVACAO: 'EM_RENOVACAO',
   VENCIDO: 'VENCIDO',
   ENCERRADO: 'ENCERRADO',
 } as const

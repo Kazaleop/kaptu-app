@@ -1,0 +1,8 @@
+target/
+.env
+arquivos/
+data/
+postman/
+.postman/
+.idea/
+.vscode/

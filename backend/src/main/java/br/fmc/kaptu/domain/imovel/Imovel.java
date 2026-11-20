@@ -88,4 +88,27 @@ public class Imovel extends EntidadeBase {
     public StatusOcupacao getStatusOcupacao() {
         return statusOcupacao;
     }
+
+    public void atualizarDados(
+            String nome,
+            String endereco,
+            String bairro,
+            int quantResidentes,
+            BigDecimal valorAluguelMensal) {
+
+        if (nome != null && !nome.isBlank()) {
+            this.nome = nome.trim();
+        }
+
+        if (endereco != null && !endereco.isBlank()) {
+            this.endereco = endereco.trim();
+        }
+
+        if (bairro != null && !bairro.isBlank()) {
+            this.bairro = bairro.trim();
+        }
+
+        this.quantResidentes = quantResidentes;
+        this.valorAluguelMensal = valorAluguelMensal;
+    }
 }

@@ -6,6 +6,9 @@ import br.fmc.kaptu.domain.imovel.StatusContrato;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 
     boolean existsByImovel_IdAndStatusContrato(
@@ -14,4 +17,9 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     );
 
     long countByStatusContrato(StatusContrato statusContrato);
+
+    List<Contrato> findByStatusContratoAndDataValidadeBefore(
+            StatusContrato statusContrato,
+            LocalDate data
+    );
 }
