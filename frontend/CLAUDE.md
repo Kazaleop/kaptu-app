@@ -41,7 +41,7 @@ Situação em 2026-11-19 (backend em `../backend`): **tudo `true`**. Controllers
 - Novas telas vêm como `.svg` exportados do Figma (às vezes com arquivos de um plugin, que ajudam pouco). Para ver o SVG: copiar temporariamente para `public/__design/`, abrir no navegador, e **apagar a pasta ao final**.
 
 ## Pendências conhecidas
-- Deploy (2026-11-19): Vercel `https://kaptu-frontend-11-11.vercel.app` usa o backend do Railway via `.env.production` (`VITE_USE_MOCKS=false`). O CORS do Railway precisa da variável `APP_CORS_ALLOWED_ORIGINS` com o domínio da Vercel. Modo demonstração: `VITE_USE_MOCKS=true`. Ver docs Etapa 9.
+- Deploy (2026-11-19): Vercel `https://kaptu-frontend-11-11.vercel.app` e Railway frontend `https://frontend-production-2c99b21f.up.railway.app` usam o backend do Railway `https://backend-production-23c83fa9.up.railway.app` via `.env.production` (`VITE_USE_MOCKS=false`). O CORS do Railway precisa da variável `APP_CORS_ALLOWED_ORIGINS` com os domínios da Vercel e do Railway. Modo demonstração: `VITE_USE_MOCKS=true`. Ver docs Etapa 9.
 - Repositório Git criado em 2026-11-11 (branch main).
 
 Histórico detalhado de tudo que foi feito: `docs/PASSO-A-PASSO.md`.

@@ -505,12 +505,13 @@ Alguns dados não têm endpoint próprio e são **calculados no front**:
 | | URL |
 |---|---|
 | Frontend (Vercel) | https://kaptu-frontend-11-11.vercel.app |
-| Backend (Railway) | https://kaptu-production-905b28d7.up.railway.app |
+| Frontend (Railway) | https://frontend-production-2c99b21f.up.railway.app |
+| Backend (Railway) | https://backend-production-23c83fa9.up.railway.app |
 
 **No front:** o `.env.production` passou a ser:
 ```
 VITE_USE_MOCKS=false
-VITE_API_URL=https://kaptu-production-905b28d7.up.railway.app
+VITE_API_URL=https://backend-production-23c83fa9.up.railway.app
 ```
 O build da Vercel usa esse arquivo, então não é preciso cadastrar variáveis no painel. Se elas forem cadastradas lá, têm prioridade.
 

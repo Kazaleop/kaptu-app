@@ -21,8 +21,8 @@ copy .env.example .env   # Windows; no Linux/macOS use: cp .env.example .env
 mvnw.cmd spring-boot:run
 ```
 
-A API sobe em `http://localhost:8080`. O arquivo `backend/.env` foi copiado
-para esta pasta, mas continua sendo ignorado pelo Git.
+A API sobe em `http://localhost:8080` (perfil local: `mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local`).
+Testes: `mvnw.cmd test` usa H2 em memória e não toca no banco real.
 
 ## Frontend
 
@@ -37,10 +37,18 @@ npm run dev
 A interface sobe em `http://localhost:5173` (porta exigida pelo CORS padrão
 do backend).
 
+## Deploy
+
+- Produção no Railway (projeto `kaptu-app`):
+  - Backend: `https://backend-production-23c83fa9.up.railway.app` (Dockerfile em `backend/`)
+  - Frontend: `https://frontend-production-2c99b21f.up.railway.app` (Dockerfile + nginx em `frontend/`)
+- Frontend na Vercel (legado): `https://kaptu-frontend-11-11.vercel.app`
+- As variáveis de ambiente de produção ficam no painel do Railway (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `APP_CORS_ALLOWED_ORIGINS`, etc.). Nenhum segredo é versionado.
+
 ## Observações
 
 - O CORS do backend libera, por padrão, apenas `http://localhost:5173`.
 - Para usar dados de exemplo no frontend, defina `VITE_USE_MOCKS=true` em
   `frontend/.env.local`.
 - As inconsistências identificadas na análise dos dois projetos foram
-  apenas registradas; nenhum código foi alterado.
+  corrigidas na branch `fix/inconsistencias` e mescladas em `main`.
