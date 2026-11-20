@@ -23,12 +23,13 @@ public class UsuarioService {
     public GestorAdministrativo criarGestor(Usuario solicitante, String nome, String email, String senha) {
         verificarAdministrador(solicitante);
         validarDados(nome, email, senha);
-        verificarEmailDisponivel(email);
+        String emailNormalizado = email.trim().toLowerCase();
+        verificarEmailDisponivel(emailNormalizado);
 
         String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt());
 
         GestorAdministrativo gestor =
-                new GestorAdministrativo(nome, email, senhaHash);
+                new GestorAdministrativo(nome.trim(), emailNormalizado, senhaHash);
 
         return usuarioRepository.save(gestor);
     }
@@ -41,12 +42,13 @@ public class UsuarioService {
 
         verificarAdministrador(solicitante);
         validarDados(nome, email, senha);
-        verificarEmailDisponivel(email);
+        String emailNormalizado = email.trim().toLowerCase();
+        verificarEmailDisponivel(emailNormalizado);
 
         String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt());
 
         Funcionario funcionario =
-                new Funcionario(nome, email, senhaHash);
+                new Funcionario(nome.trim(), emailNormalizado, senhaHash);
 
         return usuarioRepository.save(funcionario);
     }

@@ -1,5 +1,6 @@
 package br.fmc.kaptu.web.handler;
 
+import br.fmc.kaptu.domain.excecao.AcessoNegadoExcecao;
 import br.fmc.kaptu.domain.excecao.RecursoNaoEncontradoExcecao;
 import br.fmc.kaptu.domain.excecao.RegraDeNegocioExcecao;
 import br.fmc.kaptu.web.dto.ErroRespostaDTO;
@@ -198,6 +199,18 @@ public class GlobalExceptionHandler {
         return criarResposta(
                 HttpStatus.NOT_FOUND,
                 "Recurso não encontrado.",
+                requisicao
+        );
+    }
+
+    @ExceptionHandler(AcessoNegadoExcecao.class)
+    public ResponseEntity<ErroRespostaDTO> tratarAcessoNegado(
+            AcessoNegadoExcecao excecao,
+            HttpServletRequest requisicao
+    ) {
+        return criarResposta(
+                HttpStatus.FORBIDDEN,
+                "Você não tem permissão para esta ação.",
                 requisicao
         );
     }

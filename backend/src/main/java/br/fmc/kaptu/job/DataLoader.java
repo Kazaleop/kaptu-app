@@ -46,6 +46,8 @@ public class DataLoader implements CommandLineRunner {
             return;
         }
 
+        String emailNormalizado = email.trim().toLowerCase();
+
         if (senha.length() < TAMANHO_MINIMO_SENHA) {
             log.warn(
                     "Administrador inicial não criado: a senha deve "
@@ -55,7 +57,7 @@ public class DataLoader implements CommandLineRunner {
             return;
         }
 
-        if (usuarioRepository.existsByEmail(email)) {
+        if (usuarioRepository.existsByEmail(emailNormalizado)) {
             log.info(
                     "Administrador inicial já existe para o e-mail "
                             + "configurado."
@@ -70,7 +72,7 @@ public class DataLoader implements CommandLineRunner {
 
         Administrador administrador = new Administrador(
                 "Administrador Kaptu",
-                email,
+                emailNormalizado,
                 senhaHash
         );
 
